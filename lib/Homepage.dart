@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hattrick/main.dart';
 import 'package:rive/rive.dart';
 import 'package:rive_loading/rive_loading.dart';
 import 'Models/user.dart';
@@ -21,141 +22,173 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void ShowLogOut() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            content: Container(
+              height: 147,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Color(0xFF161616)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Are You Sure You Want to Log Out?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.w600,
+                      height: 0,
+                    ),
+                  ),
+                  SizedBox(height: 23),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: 72,
+                          height: 22,
+                          decoration: BoxDecoration(
+                              color: Color(0xFF1D1D1D),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Center(
+                            child: Text(
+                              'No',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                height: 0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          auth.logOut();
+                          print("Werey wan log out");
+                          runApp(MyApp());
+                        },
+                        child: Container(
+                          width: 72,
+                          height: 22,
+                          decoration: BoxDecoration(
+                              color: Color(0xFFFFD2D7),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Center(
+                            child: Text(
+                              'Yes',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                height: 0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (auth.currentuser != null) {
+      print(auth.currentuser!.coins);
       return Scaffold(
           backgroundColor: Color(0xFF1D1D1D),
           body: Padding(
             padding: const EdgeInsets.all(15.0),
             child: ListView(
               children: [
-                Text(
-                  "Hello, \n${auth.currentuser!.FullName.toString() == null ? "User" : auth.currentuser!.username.toString()}",
-                  style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 36,
-                      color: Colors.white),
+                Row(
+                  children: [
+                    Text(
+                      "Hello, \n${auth.currentuser!.FullName.toString() == null ? "User" : auth.currentuser!.username.toString()}",
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 36,
+                          color: Colors.white),
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          ShowLogOut();
+                        },
+                        icon: Icon(
+                          Icons.logout,
+                          color: Colors.redAccent[200],
+                          weight: 1.5,
+                        ))
+                  ],
                 ),
                 Row(
                   children: [
                     Container(
-                      width: 62.56,
-                      height: 38,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Container(
-                              width: 35,
-                              height: 38,
-                              child: Stack(
-                                children: [
-                                  Positioned(
-                                    left: 0,
-                                    top: 3,
-                                    child: Container(
-                                      width: 35,
-                                      height: 35,
-                                      decoration: ShapeDecoration(
-                                        color: Colors.black,
-                                        shape: OvalBorder(),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    left: 0,
-                                    top: 0,
-                                    child: Container(
-                                      width: 35,
-                                      height: 35,
-                                      decoration: ShapeDecoration(
-                                        color: Color(0xFF7161EF),
-                                        shape: OvalBorder(),
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    left: 9,
-                                    top: 10,
-                                    child: Container(
-                                      width: 16.95,
-                                      height: 15.11,
-                                      decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: AssetImage(
-                                              'assets/Homepage/coin.png'),
-                                          //fit: BoxFit.contain,
-                                          fit: BoxFit.fill,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 40.20,
-                            top: 9,
-                            child: SizedBox(
-                              width: 22.37,
-                              child: Text(
-                                '16',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      width: 35,
+                      height: 35,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(190)),
+                      child: Image.asset(
+                        "assets/Homepage/coin.png",
+                        width: 16.95,
+                        height: 15.11,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    Text(
+                      auth.currentuser!.coins.toString(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w700,
+                        height: 0,
                       ),
                     ),
                     Spacer(),
                     GestureDetector(
                       child: Container(
-                        width: 98.88,
-                        height: 28,
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              left: 0,
-                              top: 0,
-                              child: Container(
-                                width: 98.88,
-                                height: 28,
-                                decoration: ShapeDecoration(
-                                  color: Color(0xFF2E9A6C),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                ),
+                          width: 98.88,
+                          height: 28,
+                          decoration: BoxDecoration(
+                              color: Color(0xFFFFD2D7),
+                              borderRadius: BorderRadius.circular(50)),
+                          child: Center(
+                            child: Text(
+                              'Buy Coins',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Color(0xFF322653),
+                                fontSize: 12,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                height: 0,
                               ),
                             ),
-                            Positioned(
-                              left: 13.88,
-                              top: 5,
-                              child: SizedBox(
-                                width: 71.80,
-                                child: Text(
-                                  'Buy Coins',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                          )),
                       onTap: () {
                         //...(Buy Coins)...
                       },

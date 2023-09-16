@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hattrick/Homepage.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:rive/rive.dart';
@@ -57,19 +58,20 @@ class _QuizPageState extends State<QuizPage> {
           await http.get(Uri.parse('http://localhost:5000/hard_questions'));
 
       if (responseEasy.statusCode == 200 && responseHard.statusCode == 200) {
-        final easyQuestionsData = jsonDecode(responseEasy.body);
-        final hardQuestionsData = jsonDecode(responseHard.body);
+        final List<dynamic> easyQuestionsData = jsonDecode(responseEasy.body);
+        final List<dynamic> hardQuestionsData = jsonDecode(responseHard.body);
 
         final easyQuestions = easyQuestionsData.map((doc) {
           return TestQuestion(
             question: doc['question'],
             choices: List<String>.from(
-              _shuffleOptions(List<String>.from(doc['options']),
-                  doc['correctAnswer'].toString()),
+              _shuffleOptions(
+                  List<String>.from([doc['Opt1'], doc['Opt2'], doc['Opt3']]),
+                  doc['correct_answer'].toString()),
             ),
-            correctAnswer: doc['correctAnswer'],
+            correctAnswer: doc['correct_answer'],
             difficulty: "easy",
-            duration: doc['duration'] ?? 12,
+            duration: 12, // You can update this value based on your data
           );
         }).toList();
 
@@ -77,12 +79,13 @@ class _QuizPageState extends State<QuizPage> {
           return TestQuestion(
             question: doc['question'],
             choices: List<String>.from(
-              _shuffleOptions(List<String>.from(doc['options']),
-                  doc['correctAnswer'].toString()),
+              _shuffleOptions(
+                  List<String>.from([doc['Opt1'], doc['Opt2'], doc['Opt3']]),
+                  doc['correct_answer'].toString()),
             ),
-            correctAnswer: doc['correctAnswer'],
+            correctAnswer: doc['correct_answer'],
             difficulty: "hard",
-            duration: doc['duration'] ?? 12,
+            duration: 12, // You can update this value based on your data
           );
         }).toList();
 
@@ -93,14 +96,14 @@ class _QuizPageState extends State<QuizPage> {
         // Combine and ensure no repeat questions
         final allQuestions = [
           ..._takeUniqueQuestions(easyQuestions, 2),
-          ..._takeUniqueQuestions(hardQuestions, 1),
+          ..._takeUniqueQuestions(hardQuestions, 2),
           ..._takeUniqueQuestions(easyQuestions, 2),
           ..._takeUniqueQuestions(hardQuestions, 4),
         ];
 
-        questions = allQuestions;
-        _startQuestionTimer();
-        setState(() {});
+        setState(() {
+          questions = allQuestions;
+        });
 
         print("Got Questions");
       } else {
@@ -150,175 +153,358 @@ class _QuizPageState extends State<QuizPage> {
       currentIndex++;
       _startQuestionTimer();
     } else {
-      _showResultDialog();
+      _showResultDialog(score);
     }
   }
 
-  void _showResultDialog() {
+  void _showResultDialog(score) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          content: Container(
-            width: 340,
-            height: 420,
-            child: Stack(
-              children: [
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  child: Container(
-                    width: 340,
-                    height: 420,
-                    decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+        if (score > 9) {
+          GameDone();
+          return AlertDialog(
+            content: Container(
+              width: 340,
+              height: 420,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    child: Container(
+                      width: 340,
+                      height: 420,
+                      decoration: ShapeDecoration(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Positioned(
-                  left: 57,
-                  top: 41,
-                  child: Text(
-                    'Congratulations!!!',
-                    style: GoogleFonts.poppins(
-                      color: Colors.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
+                  Positioned(
+                    left: 57,
+                    top: 41,
+                    child: Text(
+                      'Congratulations!!!',
+                      style: GoogleFonts.poppins(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  left: 51,
-                  top: 286,
-                  child: Container(
-                    width: 238,
-                    height: 50,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          child: Container(
-                            width: 238,
-                            height: 50,
-                            decoration: ShapeDecoration(
-                              color: Color(0xFF801EF8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                  Positioned(
+                    left: 51,
+                    top: 286,
+                    child: Container(
+                      width: 238,
+                      height: 50,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Container(
+                              width: 238,
+                              height: 50,
+                              decoration: ShapeDecoration(
+                                color: Color(0xFF801EF8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                          left: 83,
-                          top: 13,
-                          child: Text(
-                            'Continue',
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 27,
-                  top: 194,
-                  child: Container(
-                    width: 303,
-                    height: 60,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 0,
-                          top: 24,
-                          child: Text(
-                            'You Just Scored 10/10',
-                            style: GoogleFonts.poppins(
-                              color: Colors.black,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          child: Text(
-                            'You Are A Winner',
-                            style: GoogleFonts.poppins(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 107,
-                  top: 77,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          child: Container(
-                            width: 120,
-                            height: 120,
-                            decoration: ShapeDecoration(
-                              color: Color(0xFFE3E3E3),
-                              shape: OvalBorder(),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 10,
-                          top: 10,
-                          child: Container(
-                            width: 100,
-                            height: 100,
-                            decoration: ShapeDecoration(
-                              color: Color(0xFF7161EF),
-                              shape: OvalBorder(),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 22,
-                          top: 20,
-                          child: Container(
-                            width: 93,
-                            height: 97,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image:
-                                    AssetImage("assets/QuizPage/fullscore.png"),
-                                fit: BoxFit.contain,
+                          Positioned(
+                            left: 83,
+                            top: 13,
+                            child: Text(
+                              'Continue',
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  Positioned(
+                    left: 27,
+                    top: 194,
+                    child: Container(
+                      width: 303,
+                      height: 60,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            top: 24,
+                            child: Text(
+                              'You Just Scored ${score}/10',
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Text(
+                              'You Are A Winner',
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 107,
+                    top: 77,
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Container(
+                              width: 120,
+                              height: 120,
+                              decoration: ShapeDecoration(
+                                color: Color(0xFFE3E3E3),
+                                shape: OvalBorder(),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 10,
+                            top: 10,
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: ShapeDecoration(
+                                color: Color(0xFF7161EF),
+                                shape: OvalBorder(),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 22,
+                            top: 20,
+                            child: Container(
+                              width: 93,
+                              height: 97,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                      "assets/QuizPage/fullscore.jpg"),
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        } else {
+          return AlertDialog(
+            content: Container(
+              width: 340,
+              height: 420,
+              child: Stack(
+                children: [
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    child: Container(
+                      width: 340,
+                      height: 420,
+                      decoration: ShapeDecoration(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 57,
+                    top: 41,
+                    child: Text(
+                      'Congratulations!!!',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w600,
+                        height: 0,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 51,
+                    top: 286,
+                    child: Container(
+                      width: 238,
+                      height: 50,
+                      child: Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              //CODE
+                              Navigator.pop(context);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => HomePage()));
+                            },
+                            child: Positioned(
+                              left: 0,
+                              top: 0,
+                              child: Container(
+                                width: 238,
+                                height: 50,
+                                decoration: ShapeDecoration(
+                                  color: Color(0xFF801EF8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 83,
+                            top: 13,
+                            child: Text(
+                              'Continue',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                height: 0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 27,
+                    top: 194,
+                    child: Container(
+                      width: 303,
+                      height: 60,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            top: 24,
+                            child: Text(
+                              '',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 24,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                height: 0,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Text(
+                              "We didn't win",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                                height: 0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 107,
+                    top: 77,
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            left: 0,
+                            top: 0,
+                            child: Container(
+                              width: 120,
+                              height: 120,
+                              decoration: ShapeDecoration(
+                                color: Color(0xFFE3E3E3),
+                                shape: OvalBorder(),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 10,
+                            top: 10,
+                            child: Container(
+                              width: 100,
+                              height: 100,
+                              decoration: ShapeDecoration(
+                                color: Color(0xFF7161EF),
+                                shape: OvalBorder(),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: 22,
+                            top: 20,
+                            child: Container(
+                              width: 93,
+                              height: 97,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image:
+                                      AssetImage("assets/QuizPage/failed.jpg"),
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
       },
     );
   }
@@ -344,7 +530,7 @@ class _QuizPageState extends State<QuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFF1D1D1D),
-      body: questions.length < 9
+      body: questions.length < 10
           ? Center(
               child: RiveAnimation.asset(
               'assets/load.riv',
@@ -414,3 +600,5 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 }
+
+void GameDone() {}

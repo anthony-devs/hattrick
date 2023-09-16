@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../main.dart';
+
 class User {
   int? uid;
   String? FullName;
@@ -37,7 +39,7 @@ class User {
 class HattrickAuth {
   User? currentuser;
 
-  Future<void> RegisterUser({
+  Future<dynamic> RegisterUser({
     String? city,
     String? username,
     String? full_name,
@@ -73,6 +75,8 @@ class HattrickAuth {
     } else {
       throw Exception('Failed to load data');
     }
+
+    return response;
   }
 
   Future<void> PasswordlessSignIn() async {
@@ -149,5 +153,15 @@ class HattrickAuth {
       currentuser = null;
       return currentuser;
     }
+  }
+
+  Future<void> logOut() async {
+    final preferences = await SharedPreferences.getInstance();
+
+    // Save the 'username' data to local storage
+    preferences.remove("username");
+    this.currentuser = null;
+
+    runApp(MyApp());
   }
 }

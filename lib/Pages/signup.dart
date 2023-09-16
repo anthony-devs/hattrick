@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/AuthPage.dart';
@@ -74,6 +76,9 @@ class _SignupState extends State<Signup> {
       _loadCountries();
     }
 
+    Color usernameBorderColor = Colors.grey; // Default border color
+    Color emailBorderColor = Colors.grey; // Default border color
+
     Future<void> signUserUp() async {
       showDialog(
           context: context,
@@ -96,14 +101,34 @@ class _SignupState extends State<Signup> {
 
       if (isValid) {
         try {
-          auth.RegisterUser(
-              city: city.text,
-              username: username.text,
-              full_name: fullName.text,
-              email: email.text,
-              password: password.text);
-          Navigator.pop(context);
+          final response = await auth.RegisterUser(
+            city: city.text,
+            username: username.text,
+            full_name: fullName.text,
+            email: email.text,
+            password: password.text,
+          );
+
+          if (response.statusCode == 200) {
+            // Registration successful, navigate to another page
+            Navigator.pop(context);
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => AuthPage()));
+          } else if (response.statusCode == 400) {
+            // Handle username or email already exists
+            final responseData = json.decode(response.body);
+            if (responseData['error'] == 'Username already exists') {
+              setState(() {
+                usernameBorderColor = Colors.red; // Change border color to red
+              });
+            } else if (responseData['error'] == 'Email already exists') {
+              setState(() {
+                emailBorderColor = Colors.red; // Change border color to red
+              });
+            }
+          }
         } catch (e) {
+          // Handle other errors
           print(e);
           Navigator.pop(context);
         }
@@ -197,6 +222,7 @@ class _SignupState extends State<Signup> {
                       controller: this.username,
                       hintText: "Username",
                       toggleShowPassword: toggleShowPassword,
+                      borderColor: emailBorderColor,
                       isdarkMode: isdarkMode,
                       isPassword: false,
                     ),
@@ -252,6 +278,7 @@ class _SignupState extends State<Signup> {
               hintText: "Email",
               toggleShowPassword: toggleShowPassword,
               isdarkMode: isdarkMode,
+              borderColor: emailBorderColor, // Set border color
             ),
             SizedBox(height: 36),
             // Password Input

@@ -32,6 +32,7 @@ class _AuthPageState extends State<AuthPage> {
     if (auth.currentuser == null) {
       return LoginOrRegister();
     } else {
+      print(auth.currentuser);
       return HomePage();
     }
   }

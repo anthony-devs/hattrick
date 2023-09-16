@@ -136,6 +136,7 @@ class NeumorphicInputField extends StatelessWidget {
   final bool isPassword;
   final bool showPassword;
   bool isdarkMode;
+  final Color? borderColor;
   final Function() toggleShowPassword;
 
   NeumorphicInputField(
@@ -144,7 +145,8 @@ class NeumorphicInputField extends StatelessWidget {
       this.isPassword = false,
       this.showPassword = false,
       required this.toggleShowPassword,
-      required this.isdarkMode});
+      required this.isdarkMode,
+      this.borderColor});
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +169,11 @@ class NeumorphicInputField extends StatelessWidget {
                 obscureText: isPassword ? !showPassword : false,
                 decoration: InputDecoration(
                   hintText: hintText,
-                  border: InputBorder.none,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Color(
+                            borderColor!.value)), // Use the borderColor here
+                  ),
                   hintStyle: GoogleFonts.poppins(
                     color: Color.fromARGB(153, 255, 255, 255),
                     fontWeight: FontWeight.w200,

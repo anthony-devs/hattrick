@@ -81,30 +81,36 @@ class HardQuestion(db.Model):
 @cross_origin()
 def Register():
     data = request.get_json()
-    existing_user = User.query.filter_by(username=data['username']).first()
+    
+    # Check if the username and email already exist
+    existing_username = User.query.filter_by(username=data['username']).first()
+    existing_email = User.query.filter_by(email=data['email']).first()
+
+    if existing_username:
+        return jsonify({'error': 'Username already exists'}), 400
+
+    if existing_email:
+        return jsonify({'error': 'Email already exists'}), 400
+
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    if not existing_user:
-        
-        new_user = User(
-            city=data['city'],
-            password=hashed_password,
-            full_name=data['FullName'],
-            email=data['email'],
-            username=data['username'],
-            earning_balance=0,
-            coins=0,
-            practice_points=0,
-            is_subscribed=False,  # Set to False for boolean field
-            super_points=0,
-            day=str(datetime.datetime.now().day),
-            month=str(datetime.datetime.now().month),
-            year=str(datetime.datetime.now().year)
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        return {'username': new_user.username}, 200
-    else:
-        return 'There was a problem creating your account', 400
+    new_user = User(
+        city=data['city'],
+        password=hashed_password,
+        full_name=data['FullName'],
+        email=data['email'],
+        username=data['username'],
+        earning_balance=0,
+        coins=15,
+        practice_points=0,
+        is_subscribed=False,
+        super_points=0,
+        day=str(datetime.datetime.now().day),
+        month=str(datetime.datetime.now().month),
+        year=str(datetime.datetime.now().year)
+    )
+    db.session.add(new_user)
+    db.session.commit()
+    return {'username': new_user.username}, 200
 @app.route('/delete', methods=['POST'])
 @cross_origin()
 def DeleteUser():
@@ -197,5 +203,31 @@ def getHardQuestions():
     questions = HardQuestion.query.all()
     return jsonify([question.serialize for question in questions]), 200
 
+
+@app.route('/post-game', methods=['POST'])
+@cross_origin()
+@login_required  # Use the login_required decorator to ensure the user is authenticated
+def PostPracticeGame():
+    data = request.get_json()
+    user = User.query.filter_by(id=data['uid']).first() # Get the current authenticated user
+
+    if user:
+        if int(data['score']) > 9:
+        # Update the user's profile information based on the data sent in the request
+            user.earning_balance += 10000
+            user.coins -= 1
+            user.practice_points += int(data['score'])
+
+            # You can update other fields as needed
+
+            db.session.commit()  # Commit the changes to the database
+            return 'Balance Updated', 200
+        else:
+            user.practice_points += int(data['score'])
+            user.coins -= 1
+            db.session.commit()
+            return "Would have won big if Subscribed", 200
+    else:
+        return 'User not found', 404
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
