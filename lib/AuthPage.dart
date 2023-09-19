@@ -56,6 +56,7 @@ class _AuthPageState extends State<AuthPage> {
                 body: Center(child: RiveAnimation.asset('assets/load.riv')),
               );
             } else {
+              print('Logging Inn');
               return LoginOrRegister();
             }
           } else {
