@@ -117,7 +117,7 @@ class HattrickAuth {
     }
   }
 
-  Future<User?> Login(email, password) async {
+  Future<int> Login(email, password) async {
     final response = await http.post(Uri.parse('http://localhost:5000/login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -147,11 +147,15 @@ class HattrickAuth {
       );
       this.PasswordlessSignIn();
 
-      return currentuser;
+      return 200;
+    } else if (response.statusCode == 404) {
+      return 404;
+    } else if (response.statusCode == 400) {
+      return 400;
     } else {
       print("Failed To Log User In");
       currentuser = null;
-      return currentuser;
+      return 500;
     }
   }
 

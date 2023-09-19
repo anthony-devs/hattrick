@@ -87,30 +87,30 @@ def Register():
     existing_email = User.query.filter_by(email=data['email']).first()
 
     if existing_username:
-        return jsonify({'error': 'Username already exists'}), 400
+        return jsonify({'error': 'Username already exists'}), 92
 
     if existing_email:
-        return jsonify({'error': 'Email already exists'}), 400
-
-    hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
-    new_user = User(
-        city=data['city'],
-        password=hashed_password,
-        full_name=data['FullName'],
-        email=data['email'],
-        username=data['username'],
-        earning_balance=0,
-        coins=15,
-        practice_points=0,
-        is_subscribed=False,
-        super_points=0,
-        day=str(datetime.datetime.now().day),
-        month=str(datetime.datetime.now().month),
-        year=str(datetime.datetime.now().year)
-    )
-    db.session.add(new_user)
-    db.session.commit()
-    return {'username': new_user.username}, 200
+        return jsonify({'error': 'Email already exists'}), 92
+    else:
+        hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+        new_user = User(
+            city=data['city'],
+            password=hashed_password,
+            full_name=data['FullName'],
+            email=data['email'],
+            username=data['username'],
+            earning_balance=0,
+            coins=15,
+            practice_points=0,
+            is_subscribed=False,
+            super_points=0,
+            day=str(datetime.datetime.now().day),
+            month=str(datetime.datetime.now().month),
+            year=str(datetime.datetime.now().year)
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return {'username': new_user.username}, 200
 @app.route('/delete', methods=['POST'])
 @cross_origin()
 def DeleteUser():

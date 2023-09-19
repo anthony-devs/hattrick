@@ -1,8 +1,10 @@
 import 'dart:convert';
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/AuthPage.dart';
+import 'package:hattrick/main.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import '../Models/user.dart';
 import 'login.dart';
@@ -29,7 +31,7 @@ class _SignupState extends State<Signup> {
 
   final fullName = TextEditingController();
 
-  final city = TextEditingController();
+  String? city;
   bool isValid = false;
 
   bool isdarkMode = false;
@@ -60,7 +62,7 @@ class _SignupState extends State<Signup> {
     List<String> countries = [];
     List<String> cities = [];
     String selectedCountry = 'Select a Country';
-    String selectedCity = 'Select a City';
+    String? selectedCity;
     Future<void> _loadCountries() async {
       final loadedCountries = await CityService.getCountries();
       setState(() {
@@ -102,30 +104,44 @@ class _SignupState extends State<Signup> {
       if (isValid) {
         try {
           final response = await auth.RegisterUser(
-            city: city.text,
+            city: city,
             username: username.text,
             full_name: fullName.text,
             email: email.text,
             password: password.text,
           );
-
-          if (response.statusCode == 200) {
-            // Registration successful, navigate to another page
-            Navigator.pop(context);
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => AuthPage()));
-          } else if (response.statusCode == 400) {
-            // Handle username or email already exists
-            final responseData = json.decode(response.body);
-            if (responseData['error'] == 'Username already exists') {
-              setState(() {
-                usernameBorderColor = Colors.red; // Change border color to red
-              });
-            } else if (responseData['error'] == 'Email already exists') {
-              setState(() {
-                emailBorderColor = Colors.red; // Change border color to red
-              });
-            }
+          final code = response.statusCode;
+          final data = json.decode(response.body);
+          print(code);
+          if (code == 200) {
+            //Navigator.push(
+            //  context, MaterialPageRoute(builder: (context) => AuthPage()));
+            //runApp(MyApp());
+            print(code);
+          } else if (code == 404) {
+            Fluttertoast.showToast(
+                msg: data['error'],
+                textColor: Colors.white,
+                backgroundColor: Colors.deepOrange,
+                fontSize: 16.0);
+          } else if (code == 92) {
+            Fluttertoast.showToast(
+                msg: data['error'],
+                textColor: Colors.white,
+                backgroundColor: Colors.deepOrange,
+                fontSize: 16.0);
+          } else if (code == 500) {
+            Fluttertoast.showToast(
+                msg: "An Internal Server Error Occured",
+                textColor: Colors.white,
+                backgroundColor: Colors.deepOrange,
+                fontSize: 16.0);
+          } else {
+            Fluttertoast.showToast(
+                msg: "Please Check your Network and Try again later",
+                textColor: Colors.white,
+                backgroundColor: Colors.deepOrange,
+                fontSize: 16.0);
           }
         } catch (e) {
           // Handle other errors
@@ -191,20 +207,45 @@ class _SignupState extends State<Signup> {
 
     void onContinue() async {
       showModalBottomSheet(
-          context: context,
-          builder: (context) {
-            return Center(
+        context: context,
+        backgroundColor: Colors.transparent,
+        //isDismissible: false,
+        builder: (context) {
+          return BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 10.0,
+              sigmaY: 10.0,
+            ), // Adjust blur intensity
+            child: Container(
+              //height: double.infinity, // Define the height here
+              decoration: ShapeDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment(0.38, -0.93),
+                  end: Alignment(-0.38, 0.93),
+                  colors: [
+                    Color(0x598478F9),
+                    Colors.white.withOpacity(0.15000000596046448),
+                  ],
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50),
+                      topRight: Radius.circular(50)),
+                ),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    NeumorphicInputField(
-                        controller: this.city,
-                        hintText: "City",
-                        toggleShowPassword: toggleShowPassword,
-                        isdarkMode: isdarkMode,
-                        isPassword: false),
+                    CountryInputWidget(
+                      onCountrySelected: (selectedCountry) {
+                        // Update the value of the external widget here
+                        setState(() {
+                          city = selectedCountry;
+                        });
+                      },
+                    ),
                     SizedBox(
                       height: 21,
                     ),
@@ -214,6 +255,8 @@ class _SignupState extends State<Signup> {
                       toggleShowPassword: toggleShowPassword,
                       isdarkMode: isdarkMode,
                       isPassword: false,
+                      borderColor: Colors.transparent,
+                      TheIcon: Icons.text_fields,
                     ),
                     SizedBox(
                       height: 21,
@@ -225,24 +268,30 @@ class _SignupState extends State<Signup> {
                       borderColor: emailBorderColor,
                       isdarkMode: isdarkMode,
                       isPassword: false,
+                      TheIcon: Icons.person,
                     ),
                     SizedBox(height: 10),
                     NeumorphicButton(
-                        onPressed: () {
-                          signUserUp();
-                          Navigator.pop(context);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AuthPage()));
-                        },
-                        text: "Sign Up",
-                        isdarkMode: isdarkMode)
+                      onPressed: () {
+                        signUserUp();
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AuthPage(),
+                          ),
+                        );
+                      },
+                      text: "Sign Up",
+                      isdarkMode: isdarkMode,
+                    ),
                   ],
                 ),
               ),
-            );
-          });
+            ),
+          );
+        },
+      );
     }
 
     return Scaffold(
@@ -278,7 +327,8 @@ class _SignupState extends State<Signup> {
               hintText: "Email",
               toggleShowPassword: toggleShowPassword,
               isdarkMode: isdarkMode,
-              borderColor: emailBorderColor, // Set border color
+              borderColor: emailBorderColor,
+              TheIcon: Icons.email, // Set border color
             ),
             SizedBox(height: 36),
             // Password Input
@@ -289,6 +339,8 @@ class _SignupState extends State<Signup> {
               showPassword: showPassword,
               toggleShowPassword: toggleShowPassword,
               isdarkMode: isdarkMode,
+              borderColor: Colors.transparent,
+              TheIcon: Icons.password,
             ),
             SizedBox(height: 21),
             // Password Input
@@ -299,8 +351,10 @@ class _SignupState extends State<Signup> {
               showPassword: showPassword,
               toggleShowPassword: toggleShowPassword,
               isdarkMode: isdarkMode,
+              borderColor: Colors.transparent,
+              TheIcon: Icons.password,
             ),
-            Text(error, style: GoogleFonts.poppins(color: Colors.redAccent)),
+            //Text(error, style: GoogleFonts.poppins(color: Colors.redAccent)),
             SizedBox(height: 86),
             Center(
               child: NeumorphicButton(
@@ -350,7 +404,11 @@ class _SignupState extends State<Signup> {
 
   void setError(err) {
     setState(() {
-      error = err;
+      Fluttertoast.showToast(
+          msg: err.toString(),
+          textColor: Colors.white,
+          backgroundColor: Colors.deepOrange,
+          fontSize: 16.0);
     });
   }
 }
