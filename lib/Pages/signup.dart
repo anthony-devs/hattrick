@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/AuthPage.dart';
 import 'package:hattrick/main.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
+import 'package:rive/components.dart';
+import 'package:rive/rive.dart';
 import '../Models/user.dart';
 import 'login.dart';
 import 'package:hattrick/Components/city_service.dart';
@@ -86,7 +88,9 @@ class _SignupState extends State<Signup> {
           context: context,
           builder: (context) {
             return Center(
-              child: CircularProgressIndicator(color: Colors.deepPurpleAccent),
+              child: RiveAnimation.asset(
+                'assets/load.riv',
+              ),
             );
           });
       if (fullName.text.isEmpty) {
@@ -219,14 +223,7 @@ class _SignupState extends State<Signup> {
             child: Container(
               //height: double.infinity, // Define the height here
               decoration: ShapeDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment(0.38, -0.93),
-                  end: Alignment(-0.38, 0.93),
-                  colors: [
-                    Color(0x598478F9),
-                    Colors.white.withOpacity(0.15000000596046448),
-                  ],
-                ),
+                color: Color(0x598478F9),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(50),

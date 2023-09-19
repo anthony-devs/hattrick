@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -97,6 +98,7 @@ class HattrickAuth {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+
         this.currentuser = User(
           uid: data['uid'],
           FullName: data['FullName'],

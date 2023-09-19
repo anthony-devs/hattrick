@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/AuthPage.dart';
 import 'package:hattrick/main.dart';
+import 'package:intl/intl.dart';
 import 'package:rive/rive.dart';
 import 'package:rive_loading/rive_loading.dart';
 import 'Models/user.dart';
-import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,16 +22,6 @@ class _HomePageState extends State<HomePage> {
     auth.PasswordlessSignIn().then((_) {
       setState(() {}); // Refresh the widget after sign-in.
     });
-    int number = 100000000;
-
-    // Create a NumberFormat instance with the desired format
-    final formatter =
-        NumberFormat('#,###,###'); // This will format as 100,000,000
-
-    // Format the number using the NumberFormat instance
-    String formattedNumber = formatter.format(number);
-
-    print(formattedNumber); // Output: 100,000,000
   }
 
   void ShowLogOut() {
@@ -133,6 +123,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final formatter = NumberFormat('#,###,###');
     if (auth.currentuser != null) {
       print(auth.currentuser!.coins);
       return Scaffold(
@@ -150,6 +141,7 @@ class _HomePageState extends State<HomePage> {
                           fontSize: 36,
                           color: Colors.white),
                     ),
+                    Spacer(),
                     IconButton(
                         onPressed: () {
                           ShowLogOut();
@@ -177,7 +169,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Text(
-                      auth.currentuser!.coins.toString(),
+                      "${formatter.format(
+                        auth.currentuser!.coins,
+                      )}",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
