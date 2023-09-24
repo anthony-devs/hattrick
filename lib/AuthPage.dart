@@ -19,9 +19,9 @@ class _AuthPageState extends State<AuthPage> {
   @override
   void initState() {
     super.initState();
-    auth.PasswordlessSignIn().then((_) {
-      setState(() {}); // Refresh the widget after sign-in.
-    });
+    //auth.PasswordlessSignIn().then((_) {
+    //setState(() {}); // Refresh the widget after sign-in.
+    //});
 
     print(auth.currentuser);
   }
@@ -42,19 +42,17 @@ class _AuthPageState extends State<AuthPage> {
           return Scaffold(
             body: Center(child: RiveAnimation.asset('assets/load.riv')),
           );
-          ;
         } else if (snapshot.hasError) {
           // If there was an error during the Future execution
-          return Text('Error: ${snapshot.error}');
+          return LoginOrRegister();
         } else {
           // If the Future completed successfully
           bool isUsernameValid = snapshot.data ?? false;
 
           if (auth.currentuser == null) {
             if (isUsernameValid) {
-              return Scaffold(
-                body: Center(child: RiveAnimation.asset('assets/load.riv')),
-              );
+              auth.PasswordlessSignIn();
+              return HomePage();
             } else {
               print('Logging Inn');
               return LoginOrRegister();

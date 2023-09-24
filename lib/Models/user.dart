@@ -7,7 +7,7 @@ import 'dart:convert';
 import '../main.dart';
 
 class User {
-  int? uid;
+  String? uid;
   String? FullName;
   String? username;
   String? city;
@@ -80,7 +80,7 @@ class HattrickAuth {
     return response;
   }
 
-  Future<void> PasswordlessSignIn() async {
+  Future<int> PasswordlessSignIn() async {
     final preferences = await SharedPreferences.getInstance();
 
     final username = preferences.getString('username');
@@ -111,11 +111,15 @@ class HattrickAuth {
           super_points: data['super_points'],
           username: data['username'],
         );
+        print(data['uid']);
+        return 200;
       } else {
-        throw Exception(response.body);
+        //throw Exception(response.body);
+        return response.statusCode;
       }
     } else {
-      throw Exception('Login First');
+      //throw Exception('Login First');
+      return 500;
     }
   }
 
@@ -134,7 +138,7 @@ class HattrickAuth {
       final preferences = await SharedPreferences.getInstance();
 
       // Save the 'username' data to local storage
-      preferences.setString('username', data['username']);
+      preferences.setString('username', data['id']);
       currentuser = User(
         uid: data['uid'],
         FullName: data['FullName'],

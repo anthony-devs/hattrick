@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/Homepage.dart';
+import 'package:hattrick/Models/user.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:rive/rive.dart';
@@ -161,243 +163,71 @@ class _QuizPageState extends State<QuizPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        if (score > 9) {
-          GameDone();
-          return AlertDialog(
-            content: Container(
+        GameDone();
+        return AlertDialog(
+          content: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20), color: Colors.white),
               width: 340,
               height: 420,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
-                      width: 340,
-                      height: 420,
-                      decoration: ShapeDecoration(
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 57,
-                    top: 41,
-                    child: Text(
-                      'Congratulations!!!',
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: ListView(children: [
+                  Text(score < 9 ? "Game Finished" : "You Are A Winner",
                       style: GoogleFonts.poppins(
                         color: Colors.black,
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
+                      )),
+                  SizedBox(height: 4),
+                  Container(
+                    height: 128,
+                    width: 128,
+                    decoration: BoxDecoration(
+                      color: Color.fromARGB(255, 228, 228, 228),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Image.asset(score < 9
+                            ? "assets/jailed.jpg"
+                            : "assets/fullscore.jpg"),
                       ),
                     ),
                   ),
-                  Positioned(
-                    left: 51,
-                    top: 286,
-                    child: Container(
-                      width: 238,
-                      height: 50,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Container(
-                              width: 238,
-                              height: 50,
-                              decoration: ShapeDecoration(
-                                color: Color(0xFF801EF8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 83,
-                            top: 13,
-                            child: Text(
-                              'Continue',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 27,
-                    top: 194,
-                    child: Container(
-                      width: 303,
-                      height: 60,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 24,
-                            child: Text(
-                              'You Just Scored ${score}/10',
-                              style: GoogleFonts.poppins(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Text(
-                              'You Are A Winner',
-                              style: GoogleFonts.poppins(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 107,
-                    top: 77,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Container(
-                              width: 120,
-                              height: 120,
-                              decoration: ShapeDecoration(
-                                color: Color(0xFFE3E3E3),
-                                shape: OvalBorder(),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 10,
-                            top: 10,
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              decoration: ShapeDecoration(
-                                color: Color(0xFF7161EF),
-                                shape: OvalBorder(),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 22,
-                            top: 20,
-                            child: Container(
-                              width: 93,
-                              height: 97,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                      "assets/QuizPage/fullscore.jpg"),
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          return AlertDialog(
-            content: Container(
-              width: 340,
-              height: 420,
-              child: Stack(
-                children: [
-                  Positioned(
-                    left: 0,
-                    top: 0,
-                    child: Container(
-                      width: 340,
-                      height: 420,
-                      decoration: ShapeDecoration(
-                        color: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
+                  Container(
+                    child: Column(textDirection: TextDirection.ltr, children: [
+                      Text(score < 9 ? score.toString() : "What A Shot!!!",
+                          style: GoogleFonts.poppins(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          )),
+                      Text(
+                        score < 9 ? 'Practice More!!!' : 'You Are A Winner!!!',
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 57,
-                    top: 41,
-                    child: Text(
-                      'Congratulations!!!',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w600,
-                        height: 0,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 51,
-                    top: 286,
-                    child: Container(
-                      width: 238,
-                      height: 50,
-                      child: Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              //CODE
-                              Navigator.pop(context);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => HomePage()));
-                            },
-                            child: Positioned(
-                              left: 0,
-                              top: 0,
-                              child: Container(
-                                width: 238,
-                                height: 50,
-                                decoration: ShapeDecoration(
-                                  color: Color(0xFF801EF8),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
+                      GestureDetector(
+                        onTap: () => Navigator.pop,
+                        child: Container(
+                          width: 238,
+                          height: 50,
+                          decoration: ShapeDecoration(
+                            color: Color(0xFFAF89F6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          Positioned(
-                            left: 83,
-                            top: 13,
+                          child: Center(
                             child: Text(
                               'Continue',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Color(0xFF322653),
                                 fontSize: 15,
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w600,
@@ -405,106 +235,13 @@ class _QuizPageState extends State<QuizPage> {
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 27,
-                    top: 194,
-                    child: Container(
-                      width: 303,
-                      height: 60,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 24,
-                            child: Text(
-                              '',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                                height: 0,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Text(
-                              "We didn't win",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w400,
-                                height: 0,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 107,
-                    top: 77,
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            child: Container(
-                              width: 120,
-                              height: 120,
-                              decoration: ShapeDecoration(
-                                color: Color(0xFFE3E3E3),
-                                shape: OvalBorder(),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 10,
-                            top: 10,
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              decoration: ShapeDecoration(
-                                color: Color(0xFF7161EF),
-                                shape: OvalBorder(),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            left: 22,
-                            top: 20,
-                            child: Container(
-                              width: 93,
-                              height: 97,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image:
-                                      AssetImage("assets/QuizPage/failed.jpg"),
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
+                        ),
+                      )
+                    ]),
+                  )
+                ]),
+              )),
+        );
       },
     );
   }
@@ -526,79 +263,177 @@ class _QuizPageState extends State<QuizPage> {
     });
   }
 
+  final auth = HattrickAuth();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1D1D1D),
+      backgroundColor: Color(0xFFF0F8FB),
       body: questions.length < 10
           ? Center(
               child: RiveAnimation.asset(
               'assets/load.riv',
             ))
-          : Padding(
-              padding: const EdgeInsets.all(20.0),
+          : Container(
+              color: Color.fromARGB(255, 240, 248, 251),
+              //padding: const EdgeInsets.all(20.0),
               child: ListView(
                 children: [
-                  Text(remainingTime.toString()),
-                  Text(
-                    questions[currentIndex].difficulty == 'hard'
-                        ? "Hard"
-                        : "Easy",
-                    style: GoogleFonts.poppins(
-                      color: questions[currentIndex].difficulty == 'hard'
-                          ? Colors.red[400]
-                          : Colors.green[300],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                icon: Icon(
+                                  Icons.close,
+                                  color: Colors.black,
+                                )),
+                            Spacer(),
+                            Text(
+                              "${currentIndex + 1}",
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            Spacer(),
+                            Text(
+                              questions[currentIndex].difficulty == 'hard'
+                                  ? "Hard"
+                                  : "Easy",
+                              style: GoogleFonts.poppins(
+                                color:
+                                    questions[currentIndex].difficulty == 'hard'
+                                        ? Colors.red[400]
+                                        : Colors.green[300],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    'Question ${currentIndex + 1}',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w200,
-                    ),
+                  SizedBox(height: 8),
+                  LinearProgressIndicator(
+                    value: remainingTime / questions[currentIndex].duration,
+                    backgroundColor: Colors.grey[300],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                   ),
-                  SizedBox(height: 20),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width - 58,
-                    child: Text(
-                      questions[currentIndex].question,
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                    height: 13,
                   ),
-                  SizedBox(height: 20),
-                  ...questions[currentIndex].choices.map(
-                        (choice) => GestureDetector(
-                          onTap: () => _checkAnswer(choice),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 335,
-                                height: 81,
-                                child: Center(
-                                  child: Text(choice),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(50),
+                            topRight: Radius.circular(50))),
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 20),
+                          Padding(
+                            //width: MediaQuery.of(context).size.width - 58,
+                            padding: EdgeInsets.only(left: 15),
+                            child: Text(
+                              questions[currentIndex].question,
+                              style: GoogleFonts.poppins(
+                                color: Color.fromARGB(255, 43, 42, 49),
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 26),
+                          Container(
+                            width: 150,
+                            height: 47,
+                            decoration: ShapeDecoration(
+                              color: Color(0x9EFFDFB0),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "${4} Points",
+                                style: GoogleFonts.poppins(
+                                  color: Color(0xFFEA8843),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                                decoration: ShapeDecoration(
-                                  color: Color(0xFFD67836),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 26),
+                          ...questions[currentIndex].choices.map(
+                                (choice) => GestureDetector(
+                                  onTap: () => _checkAnswer(choice),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        child: Center(
+                                          child: Text(
+                                            choice,
+                                            style: GoogleFonts.poppins(
+                                              color: Color(0xFF2B2A31),
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ),
+                                        width: 335,
+                                        height: 81,
+                                        decoration: ShapeDecoration(
+                                          color: Color(0xFFF1ECF7),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 15),
+                                    ],
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 15),
-                            ],
-                          ),
-                        ),
-                      ),
+                        ]),
+                  )
                 ],
               ),
             ),
     );
   }
-}
 
-void GameDone() {}
+  Future<void> GameDone() async {
+    final response = await http.post(Uri.parse("http:localhost:5000/post-game"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'score': score.toString(),
+          'uid': this.auth.currentuser!.uid.toString()
+        }));
+    final data = jsonDecode(response.body);
+    Fluttertoast.showToast(msg: data['msg']);
+    auth.currentuser = new User(
+      uid: data['uid'],
+      FullName: data['FullName'],
+      city: data['city'],
+      coins: data['coins'],
+      earning_balance: data['earning_balance'],
+      email: data['email'],
+      is_subscribed: data['is_subscribed'],
+      practice_points: data['practice_points'],
+      super_points: data['super_points'],
+      username: data['username'],
+    );
+  }
+}

@@ -11,7 +11,6 @@ import datetime
 import requests
 import uuid
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  # Set the database URI
 app.config['SECRET_KEY'] = 'hattrick'
@@ -24,9 +23,10 @@ CORS(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
 class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    city = db.Column(db.String(20), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, unique=True)
+    city = db.Column(db.String(2000), nullable=False)
     password = db.Column(db.String(80), nullable=False)
     full_name = db.Column(db.String(5000), nullable=False)
     username = db.Column(db.String(600), nullable=False, unique=True)
@@ -40,14 +40,14 @@ class User(db.Model, UserMixin):
     month = db.Column(db.String(150), nullable=False)
     year = db.Column(db.String(150), nullable=False)
 
-
 class EasyQuestion(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    correct_answer = db.Column(db.String(10000000), nullable=True, unique=False)
-    Opt1 = db.Column(db.String(10000000), nullable=True, unique=False)
-    Opt2 = db.Column(db.String(10000000), nullable=True, unique=False)
-    Opt3 = db.Column(db.String(10000000), nullable=True, unique=False)
-    question = db.Column(db.String(10000000), nullable=True, unique=False)
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    correct_answer = db.Column(db.String(10000000), nullable=True)
+    Opt1 = db.Column(db.String(10000000), nullable=True)
+    Opt2 = db.Column(db.String(10000000), nullable=True)
+    Opt3 = db.Column(db.String(10000000), nullable=True)
+    question = db.Column(db.String(10000000), nullable=True)
+
     @property
     def serialize(self):
         return {
@@ -60,12 +60,13 @@ class EasyQuestion(db.Model):
         }
 
 class HardQuestion(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    correct_answer = db.Column(db.String(10000000), nullable=True, unique=False)
-    Opt1 = db.Column(db.String(10000000), nullable=True, unique=False)
-    Opt2 = db.Column(db.String(10000000), nullable=True, unique=False)
-    Opt3 = db.Column(db.String(10000000), nullable=True, unique=False)
-    question = db.Column(db.String(10000000), nullable=True, unique=False)
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    correct_answer = db.Column(db.String(10000000), nullable=True)
+    Opt1 = db.Column(db.String(10000000), nullable=True)
+    Opt2 = db.Column(db.String(10000000), nullable=True)
+    Opt3 = db.Column(db.String(10000000), nullable=True)
+    question = db.Column(db.String(10000000), nullable=True)
+
     @property
     def serialize(self):
         return {
@@ -92,8 +93,15 @@ def Register():
     if existing_email:
         return jsonify({'error': 'Email already exists'}), 92
     else:
+        # Generate a UUID for the new user's ID
+        new_user_id = str(uuid.uuid4())
+
+        # Hash the password
         hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
+
+        # Create a new user with the generated ID
         new_user = User(
+            id=new_user_id,
             city=data['city'],
             password=hashed_password,
             full_name=data['FullName'],
@@ -108,9 +116,11 @@ def Register():
             month=str(datetime.datetime.now().month),
             year=str(datetime.datetime.now().year)
         )
+
         db.session.add(new_user)
         db.session.commit()
         return {'username': new_user.username}, 200
+
 @app.route('/delete', methods=['POST'])
 @cross_origin()
 def DeleteUser():
@@ -123,7 +133,7 @@ def DeleteUser():
         return 'User deleted successfully', 200
     else:
         return 'User not found', 404
-    
+
 @app.route('/login', methods=['POST'])
 @cross_origin()
 def Login():
@@ -133,24 +143,24 @@ def Login():
         try:
             if user and bcrypt.check_password_hash(user.password, data['password']):
                 return jsonify({
-            'uid':user.id,
-            'username': user.username,
-            'FullName': user.full_name,
-            'city': user.city,
-            'coins': user.coins,
-            'earning_balance': user.earning_balance,
-            'email':user.email,
-            'is_subscribed':user.is_subscribed,
-            'practice_points':user.practice_points,
-            'super_points':user.super_points
-        }), 200
+                    'uid':user.id,
+                    'username': user.username,
+                    'FullName': user.full_name,
+                    'city': user.city,
+                    'coins': user.coins,
+                    'earning_balance': user.earning_balance,
+                    'email':user.email,
+                    'is_subscribed':user.is_subscribed,
+                    'practice_points':user.practice_points,
+                    'super_points':user.super_points
+                }), 200
             else:
                 return "Invalid Password", 500
         except:
             return 'There Was A problem, try again later', 500
     else:
         return 'User Not Found', 404
-    
+
 @app.route('/auth_user', methods=['POST'])
 @cross_origin()
 def AuthUser():
@@ -172,15 +182,16 @@ def AuthUser():
         }), 200
     else:
         return 'Invalid User', 404
+
 @app.route('/')
 @cross_origin()
 def index():
-    return 'Hello World!',200
+    return 'Hello World!', 200
 
 @app.route('/upload-easy', methods=["POST"])
 def uploadEasy():
     data = request.get_json()
-    new = EasyQuestion(correct_answer = data['correctAnswer'], Opt1 = data['opt1'], Opt2 = data['opt2'], Opt3 = data['opt3'], question = data['question'])
+    new = EasyQuestion(correct_answer=data['correctAnswer'], Opt1=data['opt1'], Opt2=data['opt2'], Opt3=data['opt3'], question=data['question'])
 
     db.session.add(new)
     db.session.commit()
@@ -189,10 +200,11 @@ def uploadEasy():
 @app.route('/upload-hard', methods=["POST"])
 def uploadHard():
     data = request.get_json()
-    new = HardQuestion(correct_answer = data['correctAnswer'], Opt1 = data['opt1'], Opt2 = data['opt2'], Opt3 = data['opt3'], question = data['question'])
+    new = HardQuestion(correct_answer=data['correctAnswer'], Opt1=data['opt1'], Opt2=data['opt2'], Opt3=data['opt3'], question=data['question'])
     db.session.add(new)
     db.session.commit()
     return 'Success', 200
+
 @app.route('/easy_questions', methods=["GET"])
 def getEasyQuestions():
     questions = EasyQuestion.query.all()
@@ -203,7 +215,6 @@ def getHardQuestions():
     questions = HardQuestion.query.all()
     return jsonify([question.serialize for question in questions]), 200
 
-
 @app.route('/post-game', methods=['POST'])
 @cross_origin()
 @login_required  # Use the login_required decorator to ensure the user is authenticated
@@ -212,7 +223,7 @@ def PostPracticeGame():
     user = User.query.filter_by(id=data['uid']).first() # Get the current authenticated user
 
     if user:
-        if int(data['score']) > 9:
+        if int(data['score'] and user.is_subscribed) > 9:
         # Update the user's profile information based on the data sent in the request
             user.earning_balance += 10000
             user.coins -= 1
@@ -221,13 +232,71 @@ def PostPracticeGame():
             # You can update other fields as needed
 
             db.session.commit()  # Commit the changes to the database
-            return 'Balance Updated', 200
+            return jsonify({
+            'uid':user.id,
+            'username': user.username,
+            'FullName': user.full_name,
+            'city': user.city,
+            'coins': user.coins,
+            'earning_balance': user.earning_balance,
+            'email':user.email,
+            'is_subscribed':user.is_subscribed,
+            'practice_points':user.practice_points,
+            'super_points':user.super_points,
+            'msg': 'You are A Winner'
+        }), 200
         else:
             user.practice_points += int(data['score'])
             user.coins -= 1
             db.session.commit()
-            return "Would have won big if Subscribed", 200
+            if data['score'] < 9 :
+                return jsonify({
+                'uid':user.id,
+                'username': user.username,
+                'FullName': user.full_name,
+                'city': user.city,
+                'coins': user.coins,
+                'earning_balance': user.earning_balance,
+                'email':user.email,
+                'is_subscribed':user.is_subscribed,
+                'practice_points':user.practice_points,
+                'super_points':user.super_points,
+                'msg': 'You Are getting a hang of it'
+            }), 200
+            else:
+                return jsonify({
+                'uid':user.id,
+                'username': user.username,
+                'FullName': user.full_name,
+                'city': user.city,
+                'coins': user.coins,
+                'earning_balance': user.earning_balance,
+                'email':user.email,
+                'is_subscribed':user.is_subscribed,
+                'practice_points':user.practice_points,
+                'super_points':user.super_points,
+                'msg': 'You Are Good at This!'
+            }), 200
     else:
         return 'User not found', 404
+
+@app.route("/get-board")
+def getBoard():
+    # Retrieve the top 30 users with the highest super points
+    top_users = User.query.order_by(User.super_points.desc()).all()
+
+    # Create a list of user information to return
+    leaderboard = [
+        {
+            'username': user.username,
+            'super_points': user.super_points,
+        }
+        for user in top_users
+    ]
+
+    return jsonify(leaderboard), 200
+
+        
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

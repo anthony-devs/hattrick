@@ -35,10 +35,10 @@ class _LoginState extends State<Login> {
             // Navigate to Login page
           );
         },
-        child: const Text(
+        child: Text(
           'Register now',
           style: TextStyle(
-            color: Color(0xFFFFD2D7),
+            color: Color(0xFF322653),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -46,13 +46,12 @@ class _LoginState extends State<Login> {
     }
 
     return Scaffold(
-      backgroundColor:
-          isdarkMode ? Colors.white : Color.fromARGB(255, 40, 42, 57),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: ListView(
           children: [
-            SizedBox(height: 40),
+            SizedBox(height: 137),
             Row(
               children: [
                 Padding(
@@ -60,11 +59,9 @@ class _LoginState extends State<Login> {
                   child: Text(
                     "Welcome\nBack",
                     style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                       fontSize: 36,
-                      color: isdarkMode
-                          ? Color.fromARGB(255, 40, 42, 57)
-                          : Colors.white,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -128,7 +125,7 @@ class _LoginState extends State<Login> {
               children: [
                 Text(
                   'Not a member?',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 SizedBox(width: 4),
                 regNow(),
@@ -176,37 +173,29 @@ class NeumorphicInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Color.fromARGB(31, 57, 62, 102)),
-      width: double.infinity, // Changed from fixed width to fill the parent
-      padding: EdgeInsets.all(10), // Added padding to the container
-      child: Row(
-        children: [
-          Icon(TheIcon, color: Color(0xFFFFD2D7)),
-          SizedBox(width: 8),
-          Expanded(
-            // Added Expanded widget to allow TextField to take remaining space
-            child: TextField(
-              controller: controller,
-              style: GoogleFonts.poppins(color: Colors.white),
-              obscureText: isPassword &&
-                  !showPassword, // Added to handle password fields
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFFFD2D7))),
-                labelText: hintText,
-                labelStyle: GoogleFonts.poppins(color: Colors.white),
-                hintStyle: GoogleFonts.poppins(
-                    color: Colors.white), // Moved hintText to TextField
-                focusColor: Colors.transparent,
-              ),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10), color: Color(0xFF353746)),
+        width: double.infinity, // Changed from fixed width to fill the parent
+        padding: EdgeInsets.all(10), // Added padding to the container
+        child: TextField(
+          controller: controller,
+          style: GoogleFonts.poppins(color: Colors.white),
+          obscureText:
+              isPassword && !showPassword, // Added to handle password fields
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            labelText: hintText,
+            labelStyle: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
             ),
-          )
-        ],
-      ),
-    );
+            hintStyle: GoogleFonts.poppins(
+                color: Colors.white), // Moved hintText to TextField
+            //focusColor: Colors.transparent,
+          ),
+        ));
   }
 }
 
@@ -228,16 +217,25 @@ class NeumorphicButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        height: 75,
-        width: 210,
-        decoration: BoxDecoration(
-            color: Color(0xFFFFD2D7), borderRadius: BorderRadius.circular(20)),
-        child: Center(
-            child: Padding(padding: EdgeInsets.all(0), child: Text(text))),
-      ),
-    );
+        onTap: onPressed,
+        child: Container(
+          width: 238,
+          height: 50,
+          decoration: ShapeDecoration(
+            color: Color(0xFFAF89F6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          child: Center(
+            child: Text(this.text,
+                style: GoogleFonts.poppins(
+                  color: Color(0xFF322653),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                )),
+          ),
+        ));
   }
 }
 
@@ -281,40 +279,46 @@ class _CountryInputWidgetState extends State<CountryInputWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        DropdownButton<String>(
-          hint: Text("Please Select A Country"),
-          value: selectedCountry,
-          onChanged: (String? newValue) {
-            setState(() {
-              selectedCountry = newValue; // Update selectedCountry
-              widget.onCountrySelected(newValue); // Call the callback function
-            });
-          },
-          items: [
-            DropdownMenuItem<String>(
-              value: "Select One", // Add a default value
-              child: Text("Select One"),
-            ),
-            for (Country country in countries)
+    return Container(
+      width: MediaQuery.of(context).size.width - 12,
+      child: Column(
+        children: [
+          DropdownButton<String>(
+            hint: Text("Please Select A Country"),
+            value: selectedCountry,
+            onChanged: (String? newValue) {
+              setState(() {
+                selectedCountry = newValue; // Update selectedCountry
+                widget
+                    .onCountrySelected(newValue); // Call the callback function
+              });
+            },
+            items: [
               DropdownMenuItem<String>(
-                value: country.name,
-                child: Row(
-                  children: [
-                    Image.network(
-                      country.flag,
-                      width: 30,
-                      height: 20,
-                    ),
-                    SizedBox(width: 10),
-                    Text(country.name),
-                  ],
-                ),
+                value: "Select One", // Add a default value
+                child: Text("Select One"),
               ),
-          ],
-        ), // Display the selected country or "No country selected" if null
-      ],
+              for (Country country in countries)
+                DropdownMenuItem<String>(
+                  value: country.name,
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Image.network(
+                          country.flag,
+                          width: 30,
+                          height: 20,
+                        ),
+                        SizedBox(width: 10),
+                        Text(country.name),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ), // Display the selected country or "No country selected" if null
+        ],
+      ),
     );
   }
 }

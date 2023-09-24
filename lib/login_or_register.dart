@@ -50,7 +50,6 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
         padding: const EdgeInsets.only(left: 20.0, right: 20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-      
           children: [
             Expanded(
               child: kIsWeb
@@ -59,8 +58,7 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
                       onHorizontalDragEnd: (details) {
                         if (_pageController.hasClients) {
                           final currentPage = _pageController.page ?? 0;
-                          final velocity =
-                              details.velocity.pixelsPerSecond.dx;
+                          final velocity = details.velocity.pixelsPerSecond.dx;
                           final newIndex = velocity > 0
                               ? currentPage.floor() - 1
                               : currentPage.ceil() + 1;
@@ -109,21 +107,25 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Login()), // Navigate to Login page
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Login()), // Navigate to Login page
                       );
                     },
                     child: Center(
                       child: Container(
-                        width: 147.15,
+                        width: MediaQuery.of(context).size.width / 4,
                         height: 54,
                         child: Center(
                             child: Text("Log In",
                                 style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w800, color: Colors.black))),
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.black))),
                         decoration: BoxDecoration(
                             color: Color.fromARGB(255, 218, 221, 216),
-                            borderRadius:
-                                BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10))),
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                bottomLeft: Radius.circular(10))),
                       ),
                     ),
                   ),
@@ -132,20 +134,24 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Signup()), // Navigate to Register page
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Signup()), // Navigate to Register page
                       );
                     },
                     child: Container(
-                      width: 147.15,
+                      width: MediaQuery.of(context).size.width / 4,
                       height: 54,
                       child: Center(
                           child: Text("Register",
                               style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w800, color: Colors.black))),
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.black))),
                       decoration: BoxDecoration(
                           color: Color.fromARGB(255, 244, 235, 175),
                           borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(10), bottomRight: Radius.circular(10))),
+                              topRight: Radius.circular(10),
+                              bottomRight: Radius.circular(10))),
                     ),
                   )
                 ],
@@ -163,11 +169,27 @@ class Page1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Center(child: Text(" Earn While \n You Play", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 36), textAlign: TextAlign.center)),
+        Center(
+            child: Text(" Earn While \n You Play",
+                style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 36),
+                textAlign: TextAlign.center)),
         SizedBox(height: 65),
-        Center(child: Text(" Get Awesome rewards for \n answering questions on events \n that have already happened", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14), textAlign: TextAlign.center,)),
+        Center(
+            child: Text(
+          " Get Awesome rewards for \n answering questions on events \n that have already happened",
+          style: GoogleFonts.poppins(
+              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
+          textAlign: TextAlign.center,
+        )),
         SizedBox(height: 46),
-        Image.asset('assets/SplashScreen/payment.png', width: 246, height: 224,),
+        Image.asset(
+          'assets/SplashScreen/payment.png',
+          width: 246,
+          height: 224,
+        ),
       ],
     );
   }
@@ -178,27 +200,58 @@ class Page2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Center(child: Text(" Compete \n Globally", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 36), textAlign: TextAlign.center)),
+        Center(
+            child: Text(" Compete \n Globally",
+                style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 36),
+                textAlign: TextAlign.center)),
         SizedBox(height: 65),
-        Center(child: Text(" Compete with users all over \n the world and win big weekly. ", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14), textAlign: TextAlign.center,)),
+        Center(
+            child: Text(
+          " Compete with users all over \n the world and win big weekly. ",
+          style: GoogleFonts.poppins(
+              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
+          textAlign: TextAlign.center,
+        )),
         SizedBox(height: 46),
-        Image.asset('assets/SplashScreen/earth.png', width: 246, height: 246,),
+        Image.asset(
+          'assets/SplashScreen/earth.png',
+          width: 246,
+          height: 246,
+        ),
       ],
     );
   }
 }
-
 
 class Page3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: [
-        Center(child: Text(" Earn \n Privately", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 36), textAlign: TextAlign.center)),
+        Center(
+            child: Text(" Earn \n Privately",
+                style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 36),
+                textAlign: TextAlign.center)),
         SizedBox(height: 65),
-        Center(child: Text(" As a human, your privacy matters \n so we have decided to cut down \n information that is being \n collected from you ", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14), textAlign: TextAlign.center,)),
+        Center(
+            child: Text(
+          " As a human, your privacy matters \n so we have decided to cut down \n information that is being \n collected from you ",
+          style: GoogleFonts.poppins(
+              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
+          textAlign: TextAlign.center,
+        )),
         SizedBox(height: 46),
-        Image.asset('assets/SplashScreen/secure.png', width: 246, height: 246,),
+        Image.asset(
+          'assets/SplashScreen/secure.png',
+          width: 246,
+          height: 246,
+        ),
       ],
     );
   }

@@ -54,7 +54,7 @@ class _SignupState extends State<Signup> {
         child: const Text(
           'Login',
           style: TextStyle(
-            color: Colors.blue,
+            color: Color(0xFF322653),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -292,13 +292,12 @@ class _SignupState extends State<Signup> {
     }
 
     return Scaffold(
-      backgroundColor:
-          isdarkMode ? Colors.white : Color.fromARGB(255, 40, 42, 57),
+      backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: ListView(
           children: [
-            SizedBox(height: 40),
+            SizedBox(height: 137),
             Row(
               children: [
                 Padding(
@@ -306,11 +305,9 @@ class _SignupState extends State<Signup> {
                   child: Text(
                     "Create a new \nAccount",
                     style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                       fontSize: 36,
-                      color: isdarkMode
-                          ? Color.fromARGB(255, 40, 42, 57)
-                          : Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -375,7 +372,7 @@ class _SignupState extends State<Signup> {
               children: [
                 Text(
                   'Already a member?',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                 ),
                 SizedBox(width: 4),
                 regNow(),
