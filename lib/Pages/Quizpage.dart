@@ -8,6 +8,7 @@ import 'package:hattrick/Models/user.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:rive/rive.dart';
+import 'package:wakelock/wakelock.dart';
 
 class TestQuestion {
   String question;
@@ -41,6 +42,7 @@ class _QuizPageState extends State<QuizPage> {
   @override
   void initState() {
     super.initState();
+    Wakelock.enable();
     _fetchQuestions();
     questionTimer =
         Timer(Duration.zero, () {}); // Initialize with an empty timer
@@ -323,7 +325,8 @@ class _QuizPageState extends State<QuizPage> {
                   LinearProgressIndicator(
                     value: remainingTime / questions[currentIndex].duration,
                     backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Color(0xFFEA8843)),
                   ),
                   SizedBox(
                     height: 13,

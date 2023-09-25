@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rive/rive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:delayed_widget/delayed_widget.dart';
+import 'Home.dart';
 import 'Homepage.dart';
 import 'Models/user.dart';
 import 'login_or_register.dart';
@@ -19,9 +21,9 @@ class _AuthPageState extends State<AuthPage> {
   @override
   void initState() {
     super.initState();
-    //auth.PasswordlessSignIn().then((_) {
-    //setState(() {}); // Refresh the widget after sign-in.
-    //});
+    auth.PasswordlessSignIn().then((_) {
+      setState(() {}); // Refresh the widget after sign-in.
+    });
 
     print(auth.currentuser);
   }
@@ -39,8 +41,9 @@ class _AuthPageState extends State<AuthPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // While the Future is still running, return a loading indicator or something else
+
           return Scaffold(
-            body: Center(child: RiveAnimation.asset('assets/load.riv')),
+            body: Column(children: [RiveAnimation.asset('assets/load.riv')]),
           );
         } else if (snapshot.hasError) {
           // If there was an error during the Future execution
@@ -52,14 +55,14 @@ class _AuthPageState extends State<AuthPage> {
           if (auth.currentuser == null) {
             if (isUsernameValid) {
               auth.PasswordlessSignIn();
-              return HomePage();
+              return Home();
             } else {
               print('Logging Inn');
               return LoginOrRegister();
             }
           } else {
             print(auth.currentuser);
-            return HomePage();
+            return Home();
           }
         }
       },

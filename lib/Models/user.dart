@@ -138,7 +138,7 @@ class HattrickAuth {
       final preferences = await SharedPreferences.getInstance();
 
       // Save the 'username' data to local storage
-      preferences.setString('username', data['id']);
+      preferences.setString('username', data['uid']);
       currentuser = User(
         uid: data['uid'],
         FullName: data['FullName'],
@@ -158,6 +158,8 @@ class HattrickAuth {
       return 404;
     } else if (response.statusCode == 400) {
       return 400;
+    } else if (response.statusCode == 508) {
+      return 508;
     } else {
       print("Failed To Log User In");
       currentuser = null;

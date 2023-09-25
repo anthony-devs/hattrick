@@ -8,6 +8,7 @@ import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../Models/user.dart';
+import 'package:hattrick/main.dart';
 
 class Login extends StatefulWidget {
   Login({super.key});
@@ -93,8 +94,15 @@ class _LoginState extends State<Login> {
                 onPressed: () async {
                   final code = await auth.Login(email.text, password.text);
                   if (code == 200) {
+                    Navigator.pop(context);
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AuthPage()));
+                        MaterialPageRoute(builder: (context) => MyApp()));
+                    Fluttertoast.showToast(
+                        msg: "Logged In",
+                        textColor: Colors.white,
+                        backgroundColor: Colors.deepOrange,
+                        fontSize: 16.0);
+                    // runApp(MyApp());
                   } else if (code == 404) {
                     Fluttertoast.showToast(
                         msg: "Unknown User, Please Create an Account",
@@ -104,6 +112,12 @@ class _LoginState extends State<Login> {
                   } else if (code == 500) {
                     Fluttertoast.showToast(
                         msg: "An Error Occured",
+                        textColor: Colors.white,
+                        backgroundColor: Colors.deepOrange,
+                        fontSize: 16.0);
+                  } else if (code == 508) {
+                    Fluttertoast.showToast(
+                        msg: "Invalid Password",
                         textColor: Colors.white,
                         backgroundColor: Colors.deepOrange,
                         fontSize: 16.0);

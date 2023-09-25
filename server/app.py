@@ -39,6 +39,7 @@ class User(db.Model, UserMixin):
     day = db.Column(db.String(150), nullable=False)
     month = db.Column(db.String(150), nullable=False)
     year = db.Column(db.String(150), nullable=False)
+    games_played = db.Column(db.Integer, nullable=True)
 
 class EasyQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
@@ -142,6 +143,11 @@ def Login():
     if user:
         try:
             if user and bcrypt.check_password_hash(user.password, data['password']):
+                print(data)
+                print(user.id)
+                print(user.username)
+                print(user.full_name)
+                print(user.email)
                 return jsonify({
                     'uid':user.id,
                     'username': user.username,
@@ -154,10 +160,15 @@ def Login():
                     'practice_points':user.practice_points,
                     'super_points':user.super_points
                 }), 200
+                
             else:
-                return "Invalid Password", 500
+                return jsonify({
+                    "msg" : "Invalid Password"
+                }), 508
         except:
-            return 'There Was A problem, try again later', 500
+            return jsonify({
+                    "msg" : "Production Server Down!!!"
+                }), 500
     else:
         return 'User Not Found', 404
 
@@ -166,7 +177,8 @@ def Login():
 def AuthUser():
     data = request.get_json()
     username = data['username']
-    user = User.query.filter_by(username=username).first()
+    print(username)
+    user = User.query.filter_by(id=username).first()
     if user:
         return jsonify({
             'uid':user.id,
@@ -280,23 +292,52 @@ def PostPracticeGame():
     else:
         return 'User not found', 404
 
-@app.route("/get-board")
+def get_country_flag(country_name):
+    response = requests.get(f'https://restcountries.com/v2/name/{country_name}')
+    data = response.json()
+    if response.status_code == 200:
+        return data[0]['flag']
+    else:
+        return "Country not found"
+
+
+@app.route("/get-board", methods=['GET'])
 def getBoard():
     # Retrieve the top 30 users with the highest super points
     top_users = User.query.order_by(User.super_points.desc()).all()
 
     # Create a list of user information to return
+    
     leaderboard = [
         {
             'username': user.username,
             'super_points': user.super_points,
+            'city': get_country_flag(user.city)
         }
         for user in top_users
     ]
 
     return jsonify(leaderboard), 200
 
-        
 
+def calculate_percentage(part, whole):
+    if whole == 0:
+        return 0  # Avoid division by zero
+    return (part / whole) * 100
+@app.route("/userlytics",methods=['POST'])
+def GetUserAnalytics():
+    data = request.get_json()
+    user = User.query.filter_by(username=data['username']).first()
+    all_points = user.practice_points + user.super_points
+    return jsonify({
+        'username': user.username,
+        'FullName': user.full_name,
+        'city': user.city,
+        'practice_points':user.practice_points,
+        'super_points':user.super_points,
+        'percentage' : calculate_percentage(all_points, user.games_played * 10,)
+    })
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+
