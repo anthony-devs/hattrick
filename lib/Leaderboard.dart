@@ -1,4 +1,21 @@
+import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hattrick/AuthPage.dart';
+import 'package:hattrick/Pages/Quizpage.dart';
+import 'package:hattrick/VisitProfile.dart';
+import 'package:hattrick/main.dart';
+import 'package:intl/intl.dart';
+import 'package:rive/rive.dart';
+import 'package:rive_loading/rive_loading.dart';
+import 'Homepage.dart';
+import 'LeadHome.dart';
+import 'Models/user.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cupertino_icons/cupertino_icons.dart';
 
 class LeaderBoard extends StatefulWidget {
   const LeaderBoard({super.key});
@@ -8,12 +25,100 @@ class LeaderBoard extends StatefulWidget {
 }
 
 class _LeaderBoardState extends State<LeaderBoard> {
+  final auth = HattrickAuth();
+  List<AUser> leads = [];
+  @override
+  void initState() {
+    super.initState();
+    auth.PasswordlessSignIn().then((_) {
+      setState(() {}); // Refresh the widget after sign-in.
+    });
+    fetchUsers();
+  }
+
+  Future<void> fetchUsers() async {
+    dynamic response =
+        await http.get(Uri.parse('http://localhost:5000/get-board'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      setState(() {
+        leads = data.map((userJson) => AUser.fromJson(userJson)).toList();
+      });
+    } else {
+      throw Exception('Failed to load users');
+    }
+
+    while (true) {
+      sleep(Duration(seconds: 15));
+      this.fetchUsers();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text("Leaderboard"),
-      ),
-    );
+    if (leads.isEmpty) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          shadowColor: Colors.transparent,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: Text(
+            "Leaderboards",
+            style: GoogleFonts.poppins(color: Colors.black),
+          ),
+        ),
+        body: ListView(
+          children: [
+            for (var user in leads)
+              ListTile(
+                  tileColor: user.username == auth.currentuser!.username
+                      ? Color(0xFF8C75BC)
+                      : Colors.transparent,
+                  title: Text(user.username,
+                      style: GoogleFonts.poppins(color: Colors.black)),
+                  onTap: () async {
+                    final response = await http.post(
+                      Uri.parse("http://localhost:5000/userlytics"),
+                      headers: <String, String>{
+                        'Content-Type': 'application/json; charset=UTF-8',
+                      },
+                      body: jsonEncode(<String, String>{
+                        'username': user.username,
+                      }),
+                    );
+                    final data = await jsonDecode(response.body);
+                    final all_score =
+                        data['super_points'] + data['practice_points'];
+                    double percentage = data['percentage'];
+
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) => VisitProfile(
+                          userData: data,
+                        ),
+                      ),
+                    );
+                  },
+                  subtitle: Text('Super Points: ${user.superPoints}'),
+                  trailing: Text("${leads.indexOf(user) + 1}"),
+                  leading: Container(
+                    decoration: BoxDecoration(
+                        color: Color(0xFFFFD2D7),
+                        borderRadius: BorderRadius.circular(1000)),
+                    child: SvgPicture.network(user.city, width: 20, height: 20),
+                  ))
+          ],
+        ),
+      );
+    }
   }
 }

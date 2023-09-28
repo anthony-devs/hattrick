@@ -304,7 +304,25 @@ def get_country_flag(country_name):
 @app.route("/get-board", methods=['GET'])
 def getBoard():
     # Retrieve the top 30 users with the highest super points
-    top_users = User.query.order_by(User.super_points.desc()).all()
+    top_users = User.query.order_by(User.super_points.desc()).limit(80).all()
+
+    # Create a list of user information to return
+    
+    leaderboard = [
+        {
+            'username': user.username,
+            'super_points': user.super_points,
+            'city': get_country_flag(user.city)
+        }
+        for user in top_users
+    ]
+
+    return jsonify(leaderboard), 200
+
+@app.route("/get-three", methods=['GET'])
+def getThree():
+    # Retrieve the top 30 users with the highest super points
+    top_users = User.query.order_by(User.super_points.desc()).limit(3).all()
 
     # Create a list of user information to return
     
@@ -335,7 +353,8 @@ def GetUserAnalytics():
         'city': user.city,
         'practice_points':user.practice_points,
         'super_points':user.super_points,
-        'percentage' : calculate_percentage(all_points, user.games_played * 10,)
+        'percentage' : calculate_percentage(all_points, user.games_played * 10),
+        'played' : user.games_played
     })
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -298,7 +298,7 @@ class _CountryInputWidgetState extends State<CountryInputWidget> {
       child: Column(
         children: [
           DropdownButton<String>(
-            hint: Text("Please Select A Country"),
+            hint: Text("Select A Country"),
             value: selectedCountry,
             onChanged: (String? newValue) {
               setState(() {
@@ -316,15 +316,22 @@ class _CountryInputWidgetState extends State<CountryInputWidget> {
                 DropdownMenuItem<String>(
                   value: country.name,
                   child: Container(
-                    child: Row(
+                    width: 210,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
                       children: [
                         Image.network(
                           country.flag,
-                          width: 30,
-                          height: 20,
+                          width: 20,
+                          height: 10,
                         ),
-                        SizedBox(width: 10),
-                        Text(country.name),
+                        SizedBox(width: 5),
+                        Text(
+                          country.name,
+                          maxLines: 3,
+                          overflow: TextOverflow.fade,
+                          style: GoogleFonts.poppins(),
+                        ),
                       ],
                     ),
                   ),

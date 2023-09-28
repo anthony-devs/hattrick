@@ -15,7 +15,7 @@ class User {
   int? earning_balance;
   int? coins;
   int? practice_points;
-  bool? is_subscribed;
+  bool is_subscribed;
   int? super_points;
 
   Future<void> delete() async {
@@ -31,7 +31,7 @@ class User {
     this.coins,
     this.earning_balance,
     this.email,
-    this.is_subscribed,
+    required this.is_subscribed,
     this.practice_points,
     this.super_points,
   });
