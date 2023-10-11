@@ -198,7 +198,7 @@ def AuthUser():
 @app.route('/')
 @cross_origin()
 def index():
-    return 'Hello World!', 200
+    return 'Unauthorized User', 403
 
 @app.route('/upload-easy', methods=["POST"])
 def uploadEasy():
