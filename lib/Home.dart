@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:hattrick/Leaderboard.dart';
 import 'package:hattrick/MyProfile.dart';
-
+import 'package:flutter_paystack_plus/flutter_paystack_plus.dart';
 import 'Homepage.dart';
 
 class Home extends StatefulWidget {

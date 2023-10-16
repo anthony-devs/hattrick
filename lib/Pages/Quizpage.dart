@@ -305,17 +305,7 @@ class _QuizPageState extends State<QuizPage> {
                               ),
                             ),
                             Spacer(),
-                            Text(
-                              questions[currentIndex].difficulty == 'hard'
-                                  ? "Hard"
-                                  : "Easy",
-                              style: GoogleFonts.poppins(
-                                color:
-                                    questions[currentIndex].difficulty == 'hard'
-                                        ? Colors.red[400]
-                                        : Colors.green[300],
-                              ),
-                            ),
+
                           ],
                         ),
                       ],

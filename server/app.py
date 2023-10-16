@@ -30,7 +30,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
     full_name = db.Column(db.String(5000), nullable=False)
     username = db.Column(db.String(600), nullable=False, unique=True)
-    email = db.Column(db.String(80), nullable=False, unique=True)
+    email = db.Column(db.String(8000), nullable=False, unique=True)
     earning_balance = db.Column(db.Integer, nullable=True)
     coins = db.Column(db.Integer, nullable=True)
     practice_points = db.Column(db.Integer, nullable=True)
@@ -235,12 +235,11 @@ def PostPracticeGame():
     user = User.query.filter_by(id=data['uid']).first() # Get the current authenticated user
 
     if user:
-        if int(data['score'] and user.is_subscribed) > 9:
+        if int(data['score']) > 9 and bool(user.is_subscribed):
         # Update the user's profile information based on the data sent in the request
             user.earning_balance += 10000
             user.coins -= 1
             user.practice_points += int(data['score'])
-
             # You can update other fields as needed
 
             db.session.commit()  # Commit the changes to the database
@@ -356,7 +355,69 @@ def GetUserAnalytics():
         'percentage' : calculate_percentage(all_points, user.games_played * 10),
         'played' : user.games_played
     })
+
+@app.route('/edit-user', methods=['POST'])
+@cross_origin()
+@login_required  # Use the login_required decorator to ensure the user is authenticated
+def EditUser():
+    data = request.get_json()
+    user = User.query.filter_by(id=data['uid']).first()  # Get the current authenticated user
+
+    if user:
+        # Update the user's profile information based on the data sent in the request
+        user.city = data['city']
+        user.full_name = data['FullName']
+        user.email = data['email']
+        user.username = data['username']
+        # You can update other fields as needed
+
+        db.session.commit()  # Commit the changes to the database
+
+        return jsonify({
+            'uid': user.id,
+            'username': user.username,
+            'FullName': user.full_name,
+            'city': user.city,
+            'coins': user.coins,
+            'earning_balance': user.earning_balance,
+            'email': user.email,
+            'is_subscribed': user.is_subscribed,
+            'practice_points': user.practice_points,
+            'super_points': user.super_points,
+            'msg': 'Profile updated successfully'
+        }), 200
+    else:
+        return 'User not found', 404
+    
+previous_month = 0
+
+@app.route("/buy-coins", methods=['POST'])
+def initCoins():
+    data = request.get_json()
+    user = User.query.filter_by(id=data['uid']).first()
+    if user: 
+        user.coins += int(data['amt'])
+        db.session.commit()
+        return "Coins Purchased", 200
+    else:
+        return "User Not Found", 404
+
+
+def check_new_month():
+    global previous_month
+
+    # Get the current month
+    current_month = datetime.datetime.now().month
+
+    if datetime.datetime.now().day == 1:
+        previous_month = current_month
+        return True
+    else:
+        return False
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-
+    if check_new_month:
+        top_user = User.query.order_by(User.super_points.desc()).limit(5).all()
+        # Create a list of user information to return
+        top_user.earning_balance += 50
+        

@@ -1,8 +1,9 @@
 // ignore_for_file: file_names, prefer_const_constructors, use_build_context_synchronously
-
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/AuthPage.dart';
 import 'package:hattrick/Pages/Quizpage.dart';
@@ -17,6 +18,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
+import 'package:flutter_paystack_plus/flutter_paystack_plus.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -82,6 +84,8 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Colors.transparent,
             content: Container(
               height: 147,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.all(30),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   color: Color(0xFF161616)),
@@ -235,19 +239,10 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 25),
               Row(
                 children: [
-                  Container(
-                    width: 35,
-                    height: 35,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(190),
-                    ),
-                    child: Image.asset(
-                      "assets/Homepage/coin.png",
-                      width: 16.95,
-                      height: 15.11,
-                      fit: BoxFit.contain,
-                    ),
+                  Text(
+                    "Coins",
+                    style: GoogleFonts.poppins(
+                        fontSize: 18, fontWeight: FontWeight.w800),
                   ),
                   SizedBox(width: 15),
                   Text(
@@ -287,6 +282,133 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onTap: () {
                       //...(Buy Coins)...
+                      //FlutterPaystackPlus.openPaystackPopup(customerEmail: auth.currentuser!.email.toString(), amount: amount, reference: reference, onClosed: onClosed, onSuccess: onSuccess)
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            final coins = TextEditingController();
+                            int price = 0;
+                            return AlertDialog(
+                              elevation: 0,
+                              backgroundColor: Colors.transparent,
+                              content: BackdropFilter(
+                                filter: ImageFilter.blur(
+                                  sigmaX: 10.0,
+                                  sigmaY: 10.0,
+                                ),
+                                child: Container(
+                                  height: 248,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      color: Color.fromARGB(0, 255, 255, 255)),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextFormField(
+                                        keyboardType: TextInputType.number,
+                                        inputFormatters: [
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        decoration: InputDecoration(
+                                          labelText: 'Enter a number',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                      SizedBox(height: 20),
+                                      GestureDetector(
+                                          child: Container(
+                                            width: 98.88,
+                                            height: 28,
+                                            decoration: ShapeDecoration(
+                                              color: Color(0xFFAF89F6),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                'Proceed To Pay',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.poppins(
+                                                  color: Color(0xFF322653),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  height: 0,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          onTap: () async {
+                                            setState(() {
+                                              price =
+                                                  int.parse(coins.text) * 10;
+                                            });
+                                            await FlutterPaystackPlus
+                                                .openPaystackPopup(
+                                                    customerEmail: auth
+                                                        .currentuser!.email
+                                                        .toString(),
+                                                    amount: price.toString(),
+                                                    reference: "Coins Bought",
+                                                    onClosed: () {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showMaterialBanner(
+                                                        MaterialBanner(
+                                                          content: Text(
+                                                              "You Didn't Complete Payment"),
+                                                          actions: [
+                                                            IconButton(
+                                                              icon: Icon(
+                                                                  Icons.close),
+                                                              onPressed: () {
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .hideCurrentMaterialBanner();
+                                                              },
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                                    onSuccess: () async {
+                                                      final response =
+                                                          await http.post(
+                                                        Uri.parse(
+                                                            "localhost:5000/buy-coins"),
+                                                        body: jsonEncode(<
+                                                            String, String>{
+                                                          "uid": auth
+                                                              .currentuser!.uid
+                                                              .toString(),
+                                                          "amt": coins.text
+                                                        }),
+                                                        headers: <String,
+                                                            String>{
+                                                          'Content-Type':
+                                                              'application/json; charset=UTF-8',
+                                                        },
+                                                      );
+
+                                                      if (response.statusCode ==
+                                                          200) {
+                                                        showInfo(
+                                                            "Succesfully Bought ${coins.text} Coins",
+                                                            Colors.greenAccent);
+                                                      } else {
+                                                        showInfo(
+                                                            "Could Not Finish Purchase, Try Again Later",
+                                                            Colors.deepOrange);
+                                                      }
+                                                    });
+                                          })
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          });
                     },
                   ),
                 ],
@@ -402,6 +524,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 onTap: () {
                                   //...(Withdraw)...
+                                  showInfo("I'm Just Testing Bro",
+                                      Colors.greenAccent);
                                 },
                               ),
                             ],
@@ -413,12 +537,29 @@ class _HomePageState extends State<HomePage> {
               SizedBox(height: 30),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (BuildContext context) => new QuizPage(),
-                    ),
-                  );
+                  if (auth.currentuser!.coins! < 1) {
+                    ScaffoldMessenger.of(context).showMaterialBanner(
+                      MaterialBanner(
+                        content: Text('Insufficient Coin Balance'),
+                        actions: [
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentMaterialBanner();
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) => new QuizPage(),
+                      ),
+                    );
+                  }
                 },
                 child: Container(
                     width: 150,
@@ -512,5 +653,19 @@ class _HomePageState extends State<HomePage> {
             'assets/load.riv',
           )));
     }
+  }
+
+  void showInfo(err, Color color) {
+    setState(() {
+      Fluttertoast.showToast(
+          timeInSecForIosWeb: 4,
+          gravity: ToastGravity.BOTTOM,
+          webPosition: "center",
+          webBgColor: color.value.toString(),
+          msg: err.toString(),
+          textColor: Colors.white,
+          backgroundColor: color,
+          fontSize: 16.0);
+    });
   }
 }
