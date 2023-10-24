@@ -11,19 +11,22 @@ class VisitProfile extends StatelessWidget {
     double percentage = userData['percentage'];
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
         child: ListView(
           children: [
-            SizedBox(height: 71),
+            //SizedBox(height: 71),
             Container(
-                height: 449,
+                height: 600,
+                padding: EdgeInsets.all(40),
                 decoration: ShapeDecoration(
-                  color: Color(0xFFE3D7FF),
+                  color: Color.fromARGB(108, 227, 215, 255),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30))),
                 ),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("@${userData['username']}",
                         style: GoogleFonts.poppins(
@@ -63,50 +66,59 @@ class VisitProfile extends StatelessWidget {
                               userData["played"].toString(),
                               textAlign: TextAlign.center,
                             ),
-                            Text("Games Played", textAlign: TextAlign.center)
+                            Text("Games Played",
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                    color: Color.fromARGB(98, 0, 0, 0),
+                                    fontSize: 8.0))
                           ]),
                     ),
                     SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Container(
-                            width: 122,
-                            height: 40,
-                            decoration: ShapeDecoration(
-                              color: Colors.white.withOpacity(0.75),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                              width: 122,
+                              height: 40,
+                              decoration: ShapeDecoration(
+                                color: Colors.white.withOpacity(0.75),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
                               ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                  "${userData["practice_points"]} - Practice Points",
-                                  style: GoogleFonts.poppins(
-                                    color: Color(0xFFC5ACFF),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                  )),
-                            )),
-                        Spacer(),
-                        Container(
-                            width: 122,
-                            height: 40,
-                            decoration: ShapeDecoration(
-                              color: Colors.white.withOpacity(0.75),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                              child: Center(
+                                child: Text(
+                                    "${userData["practice_points"]} - Practice Points",
+                                    style: GoogleFonts.poppins(
+                                      color: Color(0xFFC5ACFF),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400,
+                                    )),
+                              )),
+                          //Spacer(),
+                          Container(
+                              width: 122,
+                              height: 40,
+                              decoration: ShapeDecoration(
+                                color: Colors.white.withOpacity(0.75),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
                               ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                  "${percentage.toStringAsFixed(2)}% Accuracy",
-                                  style: GoogleFonts.poppins(
-                                    color: Color(0xFFC5ACFF),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w400,
-                                  )),
-                            )),
-                      ],
+                              child: Center(
+                                child: Text(
+                                    "${percentage.toStringAsFixed(2)}% Accuracy",
+                                    style: GoogleFonts.poppins(
+                                      color: Color(0xFFC5ACFF),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400,
+                                    )),
+                              )),
+                        ],
+                      ),
                     ),
                   ],
                 )),
@@ -137,26 +149,25 @@ class VisitProfile extends StatelessWidget {
                   fontWeight: FontWeight.w400,
                 )),
             SizedBox(height: 21),
-            Text("Accuracy Analytics",
+            Text("User Analytics",
                 style: GoogleFonts.poppins(
                   color: Color.fromARGB(145, 0, 0, 0),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                 )),
-            SizedBox(
-              height: 100,
-              width: 100,
-              child: CircularProgressIndicator(
-                  value: percentage / 100,
-                  backgroundColor: Colors.grey[800],
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFEA8843))),
-            ),
-            Text("${percentage.toStringAsFixed(2)}%",
+            Text("Won ${percentage.toStringAsFixed(1)}% Of Games",
                 style: GoogleFonts.poppins(
                   color: Color.fromARGB(255, 0, 0, 0),
                   fontSize: 18,
                   fontWeight: FontWeight.w400,
                 )),
+
+            Center(
+              child: LinearProgressIndicator(
+                  value: percentage / 100,
+                  backgroundColor: Colors.grey[800],
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFAF89F6))),
+            ),
             SizedBox(height: 45),
             GestureDetector(
               onTap: () {
@@ -186,7 +197,9 @@ class VisitProfile extends StatelessWidget {
                   ),
                 ),
               )),
-            )
+            ),
+
+            SizedBox(height: 20)
           ],
         ),
       ),

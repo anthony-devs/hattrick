@@ -17,14 +17,14 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
 
-class LeaderBoard extends StatefulWidget {
-  const LeaderBoard({super.key});
+class LeaderBoardBeta extends StatefulWidget {
+  const LeaderBoardBeta({super.key});
 
   @override
-  State<LeaderBoard> createState() => _LeaderBoardState();
+  State<LeaderBoardBeta> createState() => _LeaderBoardBetaState();
 }
 
-class _LeaderBoardState extends State<LeaderBoard> {
+class _LeaderBoardBetaState extends State<LeaderBoardBeta> {
   final auth = HattrickAuth();
   List<AUser> leads = [];
   @override
@@ -63,6 +63,14 @@ class _LeaderBoardState extends State<LeaderBoard> {
           shadowColor: Colors.transparent,
           elevation: 0,
           backgroundColor: Colors.transparent,
+          leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
           title: Text(
             "Leaderboards",
             style: GoogleFonts.poppins(color: Colors.black),

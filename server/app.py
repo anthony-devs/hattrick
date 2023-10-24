@@ -113,6 +113,7 @@ def Register():
             practice_points=0,
             is_subscribed=False,
             super_points=0,
+            games_played = 0,
             day=str(datetime.datetime.now().day),
             month=str(datetime.datetime.now().month),
             year=str(datetime.datetime.now().year)
@@ -227,19 +228,32 @@ def getHardQuestions():
     questions = HardQuestion.query.all()
     return jsonify([question.serialize for question in questions]), 200
 
-@app.route('/post-game', methods=['POST'])
-@cross_origin()
-@login_required  # Use the login_required decorator to ensure the user is authenticated
+@app.route("/playable", methods=["POST"])
+def Playable():
+    data = request.get_json()
+    user = User.query.filter_by(id=data['uid']).first()
+    return jsonify(
+        {
+            "coins" : user.coins
+        }
+    )
+@app.route('/post-game', methods=["POST"])
 def PostPracticeGame():
     data = request.get_json()
     user = User.query.filter_by(id=data['uid']).first() # Get the current authenticated user
-
+    print(data["type"])
     if user:
         if int(data['score']) > 9 and bool(user.is_subscribed):
         # Update the user's profile information based on the data sent in the request
-            user.earning_balance += 10000
-            user.coins -= 1
-            user.practice_points += int(data['score'])
+            if data['type'] == "QuizType.Super_League":
+                user.super_points += int(data["score"])
+                user.coins -= 1
+            else:
+                user.practice_points += int(data['score'])
+                user.coins -= 1
+                user.earning_balance += 10
+            
+            
             # You can update other fields as needed
 
             db.session.commit()  # Commit the changes to the database
@@ -257,10 +271,21 @@ def PostPracticeGame():
             'msg': 'You are A Winner'
         }), 200
         else:
-            user.practice_points += int(data['score'])
-            user.coins -= 1
+            if bool(user.is_subscribed):
+                if data['type'] == "QuizType.Super_League":
+                    user.super_points += int(data["score"])
+                    user.coins -= 1
+                    user.games_played += 1
+                else:
+                    user.practice_points += int(data['score'])
+                    user.coins -= 1
+                    user.games_played += 1
+            else:
+                user.practice_points += int(data['score'])
+                user.games_played += 1
+                user.coins -= 1
             db.session.commit()
-            if data['score'] < 9 :
+            if int(data['score']) < 9 :
                 return jsonify({
                 'uid':user.id,
                 'username': user.username,
@@ -303,7 +328,7 @@ def get_country_flag(country_name):
 @app.route("/get-board", methods=['GET'])
 def getBoard():
     # Retrieve the top 30 users with the highest super points
-    top_users = User.query.order_by(User.super_points.desc()).limit(80).all()
+    top_users = User.query.order_by(User.super_points.desc()).limit(100).all()
 
     # Create a list of user information to return
     

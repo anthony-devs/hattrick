@@ -45,13 +45,17 @@ dependencies:
   rive: ^0.11.4
   fluttertoast: ^8.2.2
   http: ^0.13.6
-  intl: ^0.18.1
+  intl: ^0.18.0
   wakelock: ^0.4.0
   delayed_widget: ^1.1.2
   google_nav_bar: ^5.0.6
   flutter_svg: ^2.0.5
   animated_size_and_fade: ^3.0.1
-  flutter_paystack_plus: ^0.0.4
+  #flutter_paystack_plus: ^0.0.4
+  #flutter_paystack: ^1.0.0
+  flutter_paystack:
+    path: C:/Users/HP/Desktop/flutter_paystack-1.0.7
+  js: ^0.6.5
 
 dev_dependencies:
   flutter_test:
@@ -74,7 +78,8 @@ flutter:
       - assets/SplashScreen/earth.png
       - assets/SplashScreen/payment.png
       - assets/SplashScreen/secure.png
-      - assets/QuizPage/fullscore.jpg
+      - assets/fullscore.jpg
+      - assets/failed.jpg
       - assets/Homepage/coin.png
       - assets/load.riv
 

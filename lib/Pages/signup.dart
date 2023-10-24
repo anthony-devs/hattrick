@@ -398,10 +398,16 @@ class _SignupState extends State<Signup> {
 
   void setError(err) {
     setState(() {
+      Color color = Colors.deepOrange;
       Fluttertoast.showToast(
+          timeInSecForIosWeb: 4,
+          gravity: ToastGravity.BOTTOM,
+          webPosition: "center",
+          webBgColor:
+              "rgba(${color.red}, ${color.green}, ${color.blue}, ${color.alpha})",
           msg: err.toString(),
           textColor: Colors.white,
-          backgroundColor: Colors.deepOrange,
+          backgroundColor: color,
           fontSize: 16.0);
     });
   }

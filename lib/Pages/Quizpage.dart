@@ -10,6 +10,8 @@ import 'package:http/http.dart' as http;
 import 'package:rive/rive.dart';
 import 'package:wakelock/wakelock.dart';
 
+import '../Models/quiz.dart';
+
 class TestQuestion {
   String question;
   List<String> choices;
@@ -27,6 +29,8 @@ class TestQuestion {
 }
 
 class QuizPage extends StatefulWidget {
+  QuizType type;
+  QuizPage({required this.type, super.key});
   @override
   _QuizPageState createState() => _QuizPageState();
 }
@@ -44,8 +48,8 @@ class _QuizPageState extends State<QuizPage> {
     super.initState();
     Wakelock.enable();
     _fetchQuestions();
-    questionTimer =
-        Timer(Duration.zero, () {}); // Initialize with an empty timer
+    questionTimer = Timer(Duration.zero, () {});
+    auth.PasswordlessSignIn(); // Initialize with an empty timer
   }
 
   @override
@@ -54,6 +58,7 @@ class _QuizPageState extends State<QuizPage> {
     super.dispose();
   }
 
+  final auth = HattrickAuth();
   Future<void> _fetchQuestions() async {
     try {
       final responseEasy =
@@ -152,12 +157,43 @@ class _QuizPageState extends State<QuizPage> {
     _moveToNextQuestion();
   }
 
+  Future<dynamic> GameDone() async {
+    final response =
+        await http.post(Uri.parse("http://localhost:5000/post-game"),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'score': score.toString(),
+              'uid': auth.currentuser!.uid.toString(),
+              'type': widget.type.toString()
+            }));
+    final data = jsonDecode(response.body);
+    Fluttertoast.showToast(msg: data['msg']);
+    //auth.currentuser = new User(
+    //uid: data['uid'],
+    //FullName: data['FullName'],
+    //city: data['city'],
+    //coins: data['coins'],
+    //earning_balance: data['earning_balance'],
+    //email: data['email'],
+    //is_subscribed: data['is_subscribed'],
+    //practice_points: data['practice_points'],
+    //super_points: data['super_points'],
+    //username: data['username'],
+    //);
+    auth.PasswordlessSignIn();
+  }
+
   void _moveToNextQuestion() {
     if (currentIndex < questions.length - 1) {
       currentIndex++;
       _startQuestionTimer();
     } else {
+      Navigator.pop(context);
+      GameDone();
       _showResultDialog(score);
+      auth.PasswordlessSignIn();
     }
   }
 
@@ -165,7 +201,6 @@ class _QuizPageState extends State<QuizPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        GameDone();
         return AlertDialog(
           content: Container(
               decoration: BoxDecoration(
@@ -186,17 +221,14 @@ class _QuizPageState extends State<QuizPage> {
                     height: 128,
                     width: 128,
                     decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage(score < 9
+                              ? "assets/failed.jpg"
+                              : "assets/fullscore.jpg")),
                       color: Color.fromARGB(255, 228, 228, 228),
                       shape: BoxShape.circle,
                     ),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Image.asset(score < 9
-                            ? "assets/jailed.jpg"
-                            : "assets/fullscore.jpg"),
-                      ),
-                    ),
+                    child: Center(),
                   ),
                   Container(
                     child: Column(textDirection: TextDirection.ltr, children: [
@@ -215,7 +247,7 @@ class _QuizPageState extends State<QuizPage> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.pop,
+                        onTap: () => Navigator.pop(context),
                         child: Container(
                           width: 238,
                           height: 50,
@@ -265,7 +297,6 @@ class _QuizPageState extends State<QuizPage> {
     });
   }
 
-  final auth = HattrickAuth();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -305,7 +336,6 @@ class _QuizPageState extends State<QuizPage> {
                               ),
                             ),
                             Spacer(),
-
                           ],
                         ),
                       ],
@@ -377,8 +407,8 @@ class _QuizPageState extends State<QuizPage> {
                                             choice,
                                             style: GoogleFonts.poppins(
                                               color: Color(0xFF2B2A31),
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.w700,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ),
@@ -402,31 +432,6 @@ class _QuizPageState extends State<QuizPage> {
                 ],
               ),
             ),
-    );
-  }
-
-  Future<void> GameDone() async {
-    final response = await http.post(Uri.parse("http:localhost:5000/post-game"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'score': score.toString(),
-          'uid': this.auth.currentuser!.uid.toString()
-        }));
-    final data = jsonDecode(response.body);
-    Fluttertoast.showToast(msg: data['msg']);
-    auth.currentuser = new User(
-      uid: data['uid'],
-      FullName: data['FullName'],
-      city: data['city'],
-      coins: data['coins'],
-      earning_balance: data['earning_balance'],
-      email: data['email'],
-      is_subscribed: data['is_subscribed'],
-      practice_points: data['practice_points'],
-      super_points: data['super_points'],
-      username: data['username'],
     );
   }
 }
