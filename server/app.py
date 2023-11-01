@@ -119,9 +119,15 @@ def Register():
             year=str(datetime.datetime.now().year)
         )
 
+        if data['ref_id']:
+            referer = User.query.filter_by(username=data['ref_id']).first()
+            referer.earning_balance += 800
+            db.session.commit()
+
         db.session.add(new_user)
         db.session.commit()
         return {'username': new_user.username}, 200
+
 
 @app.route('/delete', methods=['POST'])
 @cross_origin()

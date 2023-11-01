@@ -15,6 +15,7 @@ import 'package:hattrick/main.dart';
 import 'package:intl/intl.dart';
 import 'package:rive/rive.dart';
 import 'package:rive_loading/rive_loading.dart';
+import 'CoinPacksPage.dart';
 import 'LeadHome.dart';
 import 'Models/user.dart';
 import 'dart:convert';
@@ -205,7 +206,15 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.white,
         body: RefreshIndicator(
           onRefresh: () async {
-            initState();
+            isMounted =
+                true; // Set isMounted to true when the widget is mounted
+            auth.PasswordlessSignIn().then((_) {
+              if (isMounted) {
+                setState(() {}); // Refresh the widget after sign-in.
+              }
+            });
+            //_startPaystack();
+            fetchUsers();
           },
           child: Padding(
             padding: EdgeInsets.only(left: 20, right: 20),
@@ -315,7 +324,7 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute<void>(
-                            builder: (BuildContext context) => BuyCoins(
+                            builder: (BuildContext context) => CoinPacks(
                               auth: auth,
                             ),
                           ),
@@ -401,7 +410,7 @@ class _HomePageState extends State<HomePage> {
                                 Container(
                                   width: 178,
                                   child: Text(
-                                    "\$ ${formatter.format(auth.currentuser!.earning_balance)}",
+                                    "₦ ${formatter.format(auth.currentuser!.earning_balance)}",
                                     style: GoogleFonts.poppins(
                                       color: Color(0xFF8C75BC),
                                       fontSize: 32,
