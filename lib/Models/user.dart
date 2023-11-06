@@ -17,24 +17,25 @@ class User {
   int? practice_points;
   bool is_subscribed;
   int? super_points;
+  dynamic? played;
 
   Future<void> delete() async {
     final response = await http.post(Uri.parse('http://localhost:5000/delete'),
         body: jsonEncode({'uid': uid.toString()}));
   }
 
-  User({
-    this.uid,
-    this.username,
-    this.FullName,
-    this.city,
-    this.coins,
-    this.earning_balance,
-    this.email,
-    required this.is_subscribed,
-    this.practice_points,
-    this.super_points,
-  });
+  User(
+      {this.uid,
+      this.username,
+      this.FullName,
+      this.city,
+      this.coins,
+      this.earning_balance,
+      this.email,
+      required this.is_subscribed,
+      this.practice_points,
+      this.super_points,
+      this.played = 0});
 }
 
 class HattrickAuth {
@@ -86,31 +87,30 @@ class HattrickAuth {
     final username = preferences.getString('username');
 
     if (username != null) {
-      final response = await http.post(
-        Uri.parse('http://localhost:5000/auth_user'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'username': username.toString(),
-        }),
-      );
+      final response =
+          await http.post(Uri.parse('http://localhost:5000/auth_user'),
+              body: jsonEncode(<String, String>{
+                'username': username.toString(),
+              }),
+              headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          });
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
         this.currentuser = User(
-          uid: data['uid'],
-          FullName: data['FullName'],
-          city: data['city'],
-          coins: data['coins'],
-          earning_balance: data['earning_balance'],
-          email: data['email'],
-          is_subscribed: data['is_subscribed'],
-          practice_points: data['practice_points'],
-          super_points: data['super_points'],
-          username: data['username'],
-        );
+            uid: data['uid'],
+            FullName: data['FullName'],
+            city: data['city'],
+            coins: data['coins'],
+            earning_balance: data['earning_balance'],
+            email: data['email'],
+            is_subscribed: data['is_subscribed'],
+            practice_points: data['practice_points'],
+            super_points: data['super_points'],
+            username: data['username'],
+            played: data['played']);
         print(data['uid']);
         return 200;
       } else {
@@ -125,13 +125,13 @@ class HattrickAuth {
 
   Future<int> Login(email, password) async {
     final response = await http.post(Uri.parse('http://localhost:5000/login'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
         body: jsonEncode(<String, String>{
           'email': email.toString(),
           'password': password.toString(),
-        }));
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        });
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -140,17 +140,17 @@ class HattrickAuth {
       // Save the 'username' data to local storage
       preferences.setString('username', data['uid']);
       currentuser = User(
-        uid: data['uid'],
-        FullName: data['FullName'],
-        city: data['city'],
-        coins: data['coins'],
-        earning_balance: data['earning_balance'],
-        email: data['email'],
-        is_subscribed: data['is_subscribed'],
-        practice_points: data['practice_points'],
-        super_points: data['super_points'],
-        username: data['username'],
-      );
+          uid: data['uid'],
+          FullName: data['FullName'],
+          city: data['city'],
+          coins: data['coins'],
+          earning_balance: data['earning_balance'],
+          email: data['email'],
+          is_subscribed: data['is_subscribed'],
+          practice_points: data['practice_points'],
+          super_points: data['super_points'],
+          username: data['username'],
+          played: data['played']);
       this.PasswordlessSignIn();
 
       return 200;

@@ -160,14 +160,14 @@ class _QuizPageState extends State<QuizPage> {
   Future<dynamic> GameDone() async {
     final response =
         await http.post(Uri.parse("http://localhost:5000/post-game"),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-            },
             body: jsonEncode(<String, String>{
               'score': score.toString(),
               'uid': auth.currentuser!.uid.toString(),
               'type': widget.type.toString()
-            }));
+            }),
+            headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        });
     final data = jsonDecode(response.body);
     Fluttertoast.showToast(msg: data['msg']);
     //auth.currentuser = new User(

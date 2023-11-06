@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,6 +28,8 @@ class LeaderBoard extends StatefulWidget {
 class _LeaderBoardState extends State<LeaderBoard> {
   final auth = HattrickAuth();
   List<AUser> leads = [];
+  Map<String, Future<Uint8List>> svgImages = {};
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +52,30 @@ class _LeaderBoardState extends State<LeaderBoard> {
     }
   }
 
+  Future<Uint8List> loadSvgAsUint8List(String url) async {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final rawData = response.body;
+      final svgString = utf8.encode(rawData);
+      return Uint8List.fromList(svgString);
+    } else {
+      throw Exception('Failed to load SVG');
+    }
+  }
+
+  Widget getSvgImage(String city) {
+    return Container(
+      width: 20,
+      height: 20,
+      decoration: BoxDecoration(
+          border: Border.all(),
+          image: DecorationImage(
+            image: NetworkImage(city),
+          ),
+          shape: BoxShape.circle),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (leads.isEmpty) {
@@ -59,56 +86,54 @@ class _LeaderBoardState extends State<LeaderBoard> {
       );
     } else {
       return Scaffold(
-        appBar: AppBar(
-          shadowColor: Colors.transparent,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: Text(
-            "Leaderboards",
-            style: GoogleFonts.poppins(color: Colors.black),
-          ),
-        ),
         body: ListView(
           children: [
             for (var user in leads)
               ListTile(
-                  tileColor: user.username == auth.currentuser!.username
-                      ? Color(0xFF8C75BC)
-                      : Colors.transparent,
-                  title: Text(user.username,
-                      style: GoogleFonts.poppins(color: Colors.black)),
-                  onTap: () async {
-                    final response = await http.post(
-                      Uri.parse("http://localhost:5000/userlytics"),
-                      headers: <String, String>{
-                        'Content-Type': 'application/json; charset=UTF-8',
-                      },
-                      body: jsonEncode(<String, String>{
-                        'username': user.username,
-                      }),
-                    );
-                    final data = await jsonDecode(response.body);
-                    final all_score =
-                        data['super_points'] + data['practice_points'];
-                    double percentage = data['percentage'];
+                tileColor: user.username == auth.currentuser!.username
+                    ? Color(0xFF8C75BC)
+                    : Colors.transparent,
+                title: Text(user.username,
+                    style: GoogleFonts.poppins(color: Colors.black)),
+                onTap: () async {
+                  final response = await http.post(
+                    Uri.parse("http://localhost:5000/userlytics"),
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: jsonEncode(<String, String>{
+                      'username': user.username,
+                    }),
+                  );
+                  final data = await jsonDecode(response.body);
+                  final all_score =
+                      data['super_points'] + data['practice_points'];
+                  double percentage = data['percentage'];
 
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (BuildContext context) => VisitProfile(
-                          userData: data,
-                        ),
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) => VisitProfile(
+                        userData: data,
                       ),
-                    );
-                  },
-                  subtitle: Text('Super Points: ${user.superPoints}'),
-                  trailing: Text("${leads.indexOf(user) + 1}"),
-                  leading: Container(
-                    decoration: BoxDecoration(
-                        color: Color(0xFFFFD2D7),
-                        borderRadius: BorderRadius.circular(1000)),
-                    child: SvgPicture.network(user.city, width: 20, height: 20),
-                  ))
+                    ),
+                  );
+                },
+                subtitle: Text('Super Points: ${user.superPoints}'),
+                trailing: Text("${leads.indexOf(user) + 1}"),
+                leading: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: ShapeDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(user.city.toString()),
+                      fit: BoxFit.cover,
+                    ),
+                    shape: OvalBorder(),
+                  ),
+                  //child: Image.network(flag.toString()),
+                ),
+              ),
           ],
         ),
       );

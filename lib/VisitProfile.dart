@@ -74,52 +74,43 @@ class VisitProfile extends StatelessWidget {
                           ]),
                     ),
                     SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                              width: 122,
-                              height: 40,
-                              decoration: ShapeDecoration(
-                                color: Colors.white.withOpacity(0.75),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                    "${userData["practice_points"]} - Practice Points",
-                                    style: GoogleFonts.poppins(
-                                      color: Color(0xFFC5ACFF),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w400,
-                                    )),
+                    Container(
+                        width: 122,
+                        height: 40,
+                        decoration: ShapeDecoration(
+                          color: Colors.white.withOpacity(0.75),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                              "${userData["practice_points"]} - Practice Points",
+                              style: GoogleFonts.poppins(
+                                color: Color(0xFFC5ACFF),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400,
                               )),
-                          //Spacer(),
-                          Container(
-                              width: 122,
-                              height: 40,
-                              decoration: ShapeDecoration(
-                                color: Colors.white.withOpacity(0.75),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                    "${percentage.toStringAsFixed(2)}% Accuracy",
-                                    style: GoogleFonts.poppins(
-                                      color: Color(0xFFC5ACFF),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w400,
-                                    )),
-                              )),
-                        ],
-                      ),
-                    ),
+                        )),
+                    //Spacer(),
+                    Container(
+                        width: 122,
+                        height: 40,
+                        decoration: ShapeDecoration(
+                          color: Colors.white.withOpacity(0.75),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: Center(
+                          child:
+                              Text("${percentage.toStringAsFixed(2)}% Accuracy",
+                                  style: GoogleFonts.poppins(
+                                    color: Color(0xFFC5ACFF),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                        )),
                   ],
                 )),
             SizedBox(height: 62),

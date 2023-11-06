@@ -371,8 +371,18 @@ class _QuizHomeState extends State<QuizHome> {
                             },
                             subtitle: Text('Super Points: ${user.superPoints}'),
                             trailing: Text("${leads.indexOf(user) + 1}"),
-                            leading: SvgPicture.network(user.city,
-                                width: 20, height: 20),
+                            leading: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: ShapeDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(user.city.toString()),
+                                  fit: BoxFit.cover,
+                                ),
+                                shape: OvalBorder(),
+                              ),
+                              //child: Image.network(flag.toString()),
+                            ),
                           )
                       ]),
                     ),

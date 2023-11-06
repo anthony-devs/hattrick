@@ -408,7 +408,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 SizedBox(height: 21.72),
                                 Container(
-                                  width: 178,
+                                  //width: 178,
                                   child: Text(
                                     "₦ ${formatter.format(auth.currentuser!.earning_balance)}",
                                     style: GoogleFonts.poppins(
@@ -514,7 +514,7 @@ class _HomePageState extends State<HomePage> {
                             title: Text(user.username),
                             onTap: () async {
                               final response = await http.post(
-                                Uri.parse("http://localhost:5000/userlytics"),
+                                Uri.parse(" http://localhost:5000/userlytics"),
                                 headers: <String, String>{
                                   'Content-Type':
                                       'application/json; charset=UTF-8',
@@ -539,8 +539,18 @@ class _HomePageState extends State<HomePage> {
                             },
                             subtitle: Text('Super Points: ${user.superPoints}'),
                             trailing: Text("${leads.indexOf(user) + 1}"),
-                            leading: SvgPicture.network(user.city,
-                                width: 20, height: 20),
+                            leading: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: ShapeDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(user.city.toString()),
+                                  fit: BoxFit.cover,
+                                ),
+                                shape: OvalBorder(),
+                              ),
+                              //child: Image.network(flag.toString()),
+                            ),
                           )
                       ],
                     ),

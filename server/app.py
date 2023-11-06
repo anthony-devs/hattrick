@@ -165,7 +165,8 @@ def Login():
                     'email':user.email,
                     'is_subscribed':user.is_subscribed,
                     'practice_points':user.practice_points,
-                    'super_points':user.super_points
+                    'super_points':user.super_points,
+                    'played' : user.games_played,
                 }), 200
                 
             else:
@@ -197,7 +198,8 @@ def AuthUser():
             'email':user.email,
             'is_subscribed':user.is_subscribed,
             'practice_points':user.practice_points,
-            'super_points':user.super_points
+            'super_points':user.super_points,
+            'played' : user.games_played,
         }), 200
     else:
         return 'Invalid User', 404
@@ -326,7 +328,7 @@ def get_country_flag(country_name):
     response = requests.get(f'https://restcountries.com/v2/name/{country_name}')
     data = response.json()
     if response.status_code == 200:
-        return data[0]['flag']
+        return data[0]['flags']['png']
     else:
         return "Country not found"
 
@@ -384,7 +386,8 @@ def GetUserAnalytics():
         'practice_points':user.practice_points,
         'super_points':user.super_points,
         'percentage' : calculate_percentage(all_points, user.games_played * 10),
-        'played' : user.games_played
+        'played' : user.games_played,
+        'flag': get_country_flag(user.city)
     })
 
 @app.route('/edit-user', methods=['POST'])
