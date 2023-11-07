@@ -28,7 +28,7 @@ class QuizUploader extends StatelessWidget {
 
           await http.post(
             Uri.parse(
-                "http://localhost:5000/upload-${difficulty == 'easy' ? 'easy' : 'hard'}"),
+                "https://hattrick-server-production.up.railway.app//upload-${difficulty == 'easy' ? 'easy' : 'hard'}"),
             body: jsonEncode(<String, String>{
               'question': question,
               'correctAnswer': correctAnswer,

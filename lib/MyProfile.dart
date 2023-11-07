@@ -49,7 +49,8 @@ class _MyProfileState extends State<MyProfile> {
 
   dynamic getUserlytics() async {
     final response = await http.post(
-      Uri.parse("http://localhost:5000/userlytics"),
+      Uri.parse(
+          "https://hattrick-server-production.up.railway.app//userlytics"),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -106,7 +107,8 @@ class _MyProfileState extends State<MyProfile> {
                 IconButton(
                     onPressed: () async {
                       final response = await http.post(
-                        Uri.parse("http://localhost:5000/userlytics"),
+                        Uri.parse(
+                            "https://hattrick-server-production.up.railway.app//userlytics"),
                         headers: <String, String>{
                           'Content-Type': 'application/json; charset=UTF-8',
                         },

@@ -38,8 +38,8 @@ class _LeaderBoardState extends State<LeaderBoard> {
   }
 
   Future<void> fetchUsers() async {
-    dynamic response =
-        await http.get(Uri.parse('http://localhost:5000/get-board'));
+    dynamic response = await http.get(Uri.parse(
+        'https://hattrick-server-production.up.railway.app//get-board'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -97,7 +97,8 @@ class _LeaderBoardState extends State<LeaderBoard> {
                     style: GoogleFonts.poppins(color: Colors.black)),
                 onTap: () async {
                   final response = await http.post(
-                    Uri.parse("http://localhost:5000/userlytics"),
+                    Uri.parse(
+                        "https://hattrick-server-production.up.railway.app//userlytics"),
                     headers: <String, String>{
                       'Content-Type': 'application/json; charset=UTF-8',
                     },

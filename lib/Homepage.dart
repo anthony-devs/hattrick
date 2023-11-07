@@ -78,8 +78,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchUsers() async {
-    dynamic response =
-        await http.get(Uri.parse('http://localhost:5000/get-three'));
+    dynamic response = await http.get(Uri.parse(
+        'https://hattrick-server-production.up.railway.app//get-three'));
 
     if (isMounted) {
       // Check if the widget is still mounted
@@ -514,7 +514,8 @@ class _HomePageState extends State<HomePage> {
                             title: Text(user.username),
                             onTap: () async {
                               final response = await http.post(
-                                Uri.parse(" http://localhost:5000/userlytics"),
+                                Uri.parse(
+                                    " https://hattrick-server-production.up.railway.app//userlytics"),
                                 headers: <String, String>{
                                   'Content-Type':
                                       'application/json; charset=UTF-8',

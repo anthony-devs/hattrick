@@ -20,7 +20,8 @@ class User {
   dynamic? played;
 
   Future<void> delete() async {
-    final response = await http.post(Uri.parse('http://localhost:5000/delete'),
+    final response = await http.post(
+        Uri.parse('https://hattrick-server-production.up.railway.app//delete'),
         body: jsonEncode({'uid': uid.toString()}));
   }
 
@@ -49,7 +50,7 @@ class HattrickAuth {
     String? password,
   }) async {
     final response = await http.post(
-      Uri.parse('http://localhost:5000/register'),
+      Uri.parse('https://hattrick-server-production.up.railway.app//register'),
       body: jsonEncode(<String, String>{
         'city': city.toString(),
         'FullName': full_name.toString(),
@@ -87,12 +88,13 @@ class HattrickAuth {
     final username = preferences.getString('username');
 
     if (username != null) {
-      final response =
-          await http.post(Uri.parse('http://localhost:5000/auth_user'),
-              body: jsonEncode(<String, String>{
-                'username': username.toString(),
-              }),
-              headers: <String, String>{
+      final response = await http.post(
+          Uri.parse(
+              'https://hattrick-server-production.up.railway.app//auth_user'),
+          body: jsonEncode(<String, String>{
+            'username': username.toString(),
+          }),
+          headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           });
 
@@ -124,7 +126,8 @@ class HattrickAuth {
   }
 
   Future<int> Login(email, password) async {
-    final response = await http.post(Uri.parse('http://localhost:5000/login'),
+    final response = await http.post(
+        Uri.parse('https://hattrick-server-production.up.railway.app//login'),
         body: jsonEncode(<String, String>{
           'email': email.toString(),
           'password': password.toString(),

@@ -57,8 +57,8 @@ class _QuizHomeState extends State<QuizHome> {
   }
 
   Future<void> fetchUsers() async {
-    dynamic response =
-        await http.get(Uri.parse('http://localhost:5000/get-three'));
+    dynamic response = await http.get(Uri.parse(
+        'https://hattrick-server-production.up.railway.app//get-three'));
 
     if (isMounted) {
       // Check if the widget is still mounted
@@ -169,7 +169,7 @@ class _QuizHomeState extends State<QuizHome> {
                                   if (auth.currentuser!.is_subscribed) {
                                     final response = await http.post(
                                       Uri.parse(
-                                          "http://localhost:5000/playable"),
+                                          "https://hattrick-server-production.up.railway.app//playable"),
                                       body: jsonEncode(<String, String>{
                                         'uid': auth.currentuser!.uid.toString()
                                       }),
@@ -246,7 +246,8 @@ class _QuizHomeState extends State<QuizHome> {
                   GestureDetector(
                     onTap: () async {
                       final response = await http.post(
-                        Uri.parse("http://localhost:5000/playable"),
+                        Uri.parse(
+                            "https://hattrick-server-production.up.railway.app//playable"),
                         body: jsonEncode(<String, String>{
                           'uid': auth.currentuser!.uid.toString()
                         }),
@@ -346,7 +347,8 @@ class _QuizHomeState extends State<QuizHome> {
                             title: Text(user.username),
                             onTap: () async {
                               final response = await http.post(
-                                Uri.parse("http://localhost:5000/userlytics"),
+                                Uri.parse(
+                                    "https://hattrick-server-production.up.railway.app//userlytics"),
                                 headers: <String, String>{
                                   'Content-Type':
                                       'application/json; charset=UTF-8',

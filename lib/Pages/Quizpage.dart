@@ -61,10 +61,10 @@ class _QuizPageState extends State<QuizPage> {
   final auth = HattrickAuth();
   Future<void> _fetchQuestions() async {
     try {
-      final responseEasy =
-          await http.get(Uri.parse('http://localhost:5000/easy_questions'));
-      final responseHard =
-          await http.get(Uri.parse('http://localhost:5000/hard_questions'));
+      final responseEasy = await http.get(Uri.parse(
+          'https://hattrick-server-production.up.railway.app//easy_questions'));
+      final responseHard = await http.get(Uri.parse(
+          'https://hattrick-server-production.up.railway.app//hard_questions'));
 
       if (responseEasy.statusCode == 200 && responseHard.statusCode == 200) {
         final List<dynamic> easyQuestionsData = jsonDecode(responseEasy.body);
@@ -158,14 +158,15 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   Future<dynamic> GameDone() async {
-    final response =
-        await http.post(Uri.parse("http://localhost:5000/post-game"),
-            body: jsonEncode(<String, String>{
-              'score': score.toString(),
-              'uid': auth.currentuser!.uid.toString(),
-              'type': widget.type.toString()
-            }),
-            headers: <String, String>{
+    final response = await http.post(
+        Uri.parse(
+            "https://hattrick-server-production.up.railway.app//post-game"),
+        body: jsonEncode(<String, String>{
+          'score': score.toString(),
+          'uid': auth.currentuser!.uid.toString(),
+          'type': widget.type.toString()
+        }),
+        headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         });
     final data = jsonDecode(response.body);
