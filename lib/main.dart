@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:hattrick/AuthPage.dart';
 import 'package:hattrick/Homepage.dart';
 import 'package:hattrick/Models/user.dart';
-
 import 'Pages/Quizpage.dart';
 import 'Pages/login.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'Pages/quizupload.dart';
 //import 'firebase_options.dart';
 //import 'package:firebase_core/firebase_core.dart';
+//import 'package:awesome_notifications/awesome_notifications.dart';
 
-void main() {
-  final auth = HattrickAuth();
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+ 
+  
+  final auth = HattrickAuth();
   runApp(MyApp());
 }
 
@@ -61,19 +63,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -82,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    //return AuthPage();
     return AuthPage();
+    //return QuizUploader();
   }
 }

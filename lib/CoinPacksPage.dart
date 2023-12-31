@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_paystack/flutter_paystack.dart';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/BuyCoins.dart';
 import 'package:hattrick/CoinPacksPage.dart';
 import 'package:hattrick/Models/user.dart';
-import 'package:hattrick/services/paystack_integration.dart';
+//import 'package:hattrick/services/paystack_integration.dart';
 import 'Models/user.dart';
 
 class CoinPack {
@@ -54,7 +54,7 @@ class CoinPacks extends StatelessWidget {
                       height: 169,
                       padding: EdgeInsets.all(16),
                       decoration: ShapeDecoration(
-                        color: Color(0xFFAF89F6),
+                        color: Color(0x5B89E2F6),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
@@ -143,7 +143,7 @@ class CoinPacks extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  '₦ ${item.price / 100}',
+                                  '\u20A6 ${item.price / 100}',
                                   style: GoogleFonts.poppins(
                                     color: Colors.black
                                         .withOpacity(0.3799999952316284),

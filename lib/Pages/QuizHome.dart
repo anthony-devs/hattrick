@@ -14,13 +14,11 @@ import 'package:hattrick/Pages/Quizpage.dart';
 import 'package:hattrick/VisitProfile.dart';
 import 'package:hattrick/main.dart';
 import 'package:intl/intl.dart';
-import 'package:rive/rive.dart';
-import 'package:rive_loading/rive_loading.dart';
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
-import 'package:flutter_paystack/flutter_paystack.dart';
 
 import '../Homepage.dart';
 import '../LeaderBoardwAppbar.dart';
@@ -214,7 +212,7 @@ class _QuizHomeState extends State<QuizHome> {
                                 child: Container(
                                   height: 45,
                                   decoration: BoxDecoration(
-                                      color: Color(0xFFAF89F6),
+                                      color: Color.fromARGB(91, 0, 0, 0),
                                       borderRadius: BorderRadius.circular(30)),
                                   child: Center(
                                     child: Padding(
@@ -243,62 +241,194 @@ class _QuizHomeState extends State<QuizHome> {
                     ),
                   ),
                   SizedBox(height: 25),
-                  GestureDetector(
-                    onTap: () async {
-                      final response = await http.post(
-                        Uri.parse(
-                            "https://hattrick-server-production.up.railway.app//playable"),
-                        body: jsonEncode(<String, String>{
-                          'uid': auth.currentuser!.uid.toString()
-                        }),
-                        headers: <String, String>{
-                          'Content-Type': 'application/json; charset=UTF-8',
-                        },
-                      );
-                      final data = jsonDecode(response.body);
-                      if (data['coins'] < 1) {
-                        ScaffoldMessenger.of(context).showMaterialBanner(
-                          MaterialBanner(
-                            content: Text('Insufficient Coin Balance'),
-                            actions: [
-                              IconButton(
-                                icon: Icon(Icons.close),
-                                onPressed: () {
-                                  ScaffoldMessenger.of(context)
-                                      .hideCurrentMaterialBanner();
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => new QuizPage(
-                              type: QuizType.Practice_Play,
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    child: Container(
-                        width: 150,
-                        height: 47,
-                        decoration: ShapeDecoration(
-                          color: Color.fromARGB(255, 255, 255, 255),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 150,
+                    padding: EdgeInsets.only(
+                        left: 12.0, right: 12.0, top: 8.0, bottom: 12.0),
+                    decoration: ShapeDecoration(
+                      color: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Practice Play',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        child: Center(
-                          child: Text("New Game",
-                              style: GoogleFonts.poppins(
-                                color: Color.fromARGB(255, 0, 0, 0),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              )),
-                        )),
+                        Text(
+                          'Put your skills on the test',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        GestureDetector(
+                            child: Container(
+                                width: 121,
+                                height: 34,
+                                decoration: BoxDecoration(
+                                    color: Color(0xFF89E2F6),
+                                    borderRadius: BorderRadius.circular(30)),
+                                child: Center(
+                                    child: Text(
+                                  'Go',
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ))),
+                            onTap: () async {
+                              final response = await http.post(
+                                Uri.parse(
+                                    "https://hattrick-server-production.up.railway.app//playable"),
+                                body: jsonEncode(<String, String>{
+                                  'uid': auth.currentuser!.uid.toString()
+                                }),
+                                headers: <String, String>{
+                                  'Content-Type':
+                                      'application/json; charset=UTF-8',
+                                },
+                              );
+                              final data = jsonDecode(response.body);
+                              if (data['coins'] < 1) {
+                                ScaffoldMessenger.of(context)
+                                    .showMaterialBanner(
+                                  MaterialBanner(
+                                    content: Text('Insufficient Coin Balance'),
+                                    actions: [
+                                      IconButton(
+                                        icon: Icon(Icons.close),
+                                        onPressed: () {
+                                          ScaffoldMessenger.of(context)
+                                              .hideCurrentMaterialBanner();
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (BuildContext context) =>
+                                        new QuizPage(
+                                      type: QuizType.Practice_Play,
+                                    ),
+                                  ),
+                                );
+                              }
+                            })
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 15),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 150,
+                    padding: EdgeInsets.only(
+                        left: 12.0, right: 12.0, top: 8.0, bottom: 12.0),
+                    decoration: ShapeDecoration(
+                      color: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Master\'s Quiz',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          'Win 10,000 Naira for every win',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        GestureDetector(
+                            child: Container(
+                                width: 121,
+                                height: 34,
+                                decoration: BoxDecoration(
+                                    color: Color(0xFFAF89F6),
+                                    borderRadius: BorderRadius.circular(30)),
+                                child: Center(
+                                    child: Text(
+                                  auth.currentuser!.is_subscribed
+                                      ? "Play"
+                                      : "Subscribe To Join",
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ))),
+                            onTap: () async {
+                              final response = await http.post(
+                                Uri.parse(
+                                    "https://hattrick-server-production.up.railway.app//playable"),
+                                body: jsonEncode(<String, String>{
+                                  'uid': auth.currentuser!.uid.toString()
+                                }),
+                                headers: <String, String>{
+                                  'Content-Type':
+                                      'application/json; charset=UTF-8',
+                                },
+                              );
+                              final data = jsonDecode(response.body);
+
+                              if (auth.currentuser!.is_subscribed) {
+                                if (data['coins'] < 1) {
+                                  ScaffoldMessenger.of(context)
+                                      .showMaterialBanner(
+                                    MaterialBanner(
+                                      content:
+                                          Text('Insufficient Coin Balance'),
+                                      actions: [
+                                        IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            ScaffoldMessenger.of(context)
+                                                .hideCurrentMaterialBanner();
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (BuildContext context) =>
+                                          new QuizPage(
+                                        type: QuizType.Masters_Game,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                //..Verify..//
+                              }
+                            })
+                      ],
+                    ),
                   ),
                   SizedBox(height: 25),
                   Row(
@@ -322,7 +452,7 @@ class _QuizHomeState extends State<QuizHome> {
                         child: Text("See Full Board",
                             style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFFAF89F6),
+                                color: Color(0x5B89E2F6),
                                 decoration: TextDecoration.underline,
                                 fontSize: 12)),
                       )
@@ -330,63 +460,101 @@ class _QuizHomeState extends State<QuizHome> {
                   ),
                   SizedBox(height: 20),
                   Container(
-                    width: MediaQuery.of(context).size.width - 60,
-                    decoration: ShapeDecoration(
-                      color: Color.fromARGB(255, 255, 255, 255),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
+                    width: MediaQuery.of(context).size.width,
                     child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Column(children: [
-                        for (var user in leads)
-                          ListTile(
-                            //textColor: Colors.white,
-                            tileColor: Color(0xFF1D1D1D),
-                            title: Text(user.username),
-                            onTap: () async {
-                              final response = await http.post(
-                                Uri.parse(
-                                    "https://hattrick-server-production.up.railway.app//userlytics"),
-                                headers: <String, String>{
-                                  'Content-Type':
-                                      'application/json; charset=UTF-8',
-                                },
-                                body: jsonEncode(<String, String>{
-                                  'username': user.username,
-                                }),
-                              );
-                              final data = jsonDecode(response.body);
-                              final all_score = data['super_points'] +
-                                  data['practice_points'];
-                              double percentage = data['percentage'];
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                      VisitProfile(
-                                    userData: data,
+                      padding:
+                          EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          for (var user in leads)
+                            GestureDetector(
+                              // title: Text(user.username),
+                              onTap: () async {
+                                final response = await http.post(
+                                  Uri.parse(
+                                      "https://hattrick-server-production.up.railway.app/userlytics"),
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8',
+                                  },
+                                  body: jsonEncode(<String, String>{
+                                    'username': user.username,
+                                  }),
+                                );
+                                final data = jsonDecode(response.body);
+                                final all_score = data['super_points'] +
+                                    data['practice_points'];
+                                double percentage = data['percentage'];
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (BuildContext context) =>
+                                        VisitProfile(
+                                      userData: data,
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            subtitle: Text('Super Points: ${user.superPoints}'),
-                            trailing: Text("${leads.indexOf(user) + 1}"),
-                            leading: Container(
-                              width: 20,
-                              height: 20,
-                              decoration: ShapeDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(user.city.toString()),
-                                  fit: BoxFit.cover,
-                                ),
-                                shape: OvalBorder(),
-                              ),
-                              //child: Image.network(flag.toString()),
-                            ),
-                          )
-                      ]),
+                                );
+                              },
+
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "0${leads.indexOf(user) + 1}",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white
+                                            .withOpacity(0.550000011920929),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    SizedBox(width: 11),
+                                    Container(
+                                      width: 20,
+                                      height: 20,
+                                      decoration: ShapeDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                              user.city.toString()),
+                                          fit: BoxFit.cover,
+                                        ),
+                                        shape: OvalBorder(),
+                                      ),
+                                      //child: Image.network(flag.toString()),
+                                    ),
+                                    SizedBox(width: 9),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          user.username,
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Super League Points: ${user.superPoints}',
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.white.withOpacity(
+                                                0.7200000286102295),
+                                            fontSize: 6,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                        SizedBox(height: 15)
+                                      ],
+                                    )
+                                  ]),
+
+                              //subtitle: Text('Super Points: ${user.superPoints}'),
+                              //trailing: Text("${leads.indexOf(user) + 1}")
+                            )
+                        ],
+                      ),
                     ),
                   ),
                 ],

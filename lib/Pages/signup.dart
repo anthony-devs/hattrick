@@ -6,12 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/AuthPage.dart';
 import 'package:hattrick/main.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
-import 'package:rive/components.dart';
-import 'package:rive/rive.dart';
+//import 'package:rive/components.dart';
 import '../Models/user.dart';
 import 'login.dart';
 import 'package:hattrick/Components/city_service.dart';
 //import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 
 class Signup extends StatefulWidget {
   Signup({super.key});
@@ -39,6 +39,66 @@ class _SignupState extends State<Signup> {
   bool isdarkMode = false;
   String error = "";
   final auth = HattrickAuth();
+  List<String> stringCountries = [
+    "Nigeria",
+    "Ghana",
+    "Niger",
+    "South Africa",
+    "Botswana",
+    "United States",
+    "Canada",
+    "England",
+    "Israel",
+    "Egypt",
+    "Germany",
+    "benin",
+    "Togo",
+    "Gambia",
+    "Senegal",
+    "Angola",
+    "Tunisia"
+  ];
+  List<Map<String, dynamic>> countries = [];
+  Future<void> fetchCountries() async {
+    for (var i in stringCountries) {
+      try {
+        final response = await http
+            .get(Uri.parse("https://restcountries.com/v3.1/name/${i}"));
+
+        if (response.statusCode == 200) {
+          final List<dynamic> data = json.decode(response.body);
+
+          // Check if the response contains data
+          if (data.isNotEmpty) {
+            final countryData = data[0]; // Access the first element
+
+            countries.add({
+              'name': countryData['name']['common'],
+              'flag': countryData['flags']['png'],
+            });
+          } else {
+            throw Exception('No data for country $i');
+          }
+        } else {
+          throw Exception('Failed to load country $i');
+        }
+      } catch (e) {
+        // TODO
+        print('Failed to load country $i');
+      }
+    }
+  }
+
+  //List<String> cities = [];
+  String selectedCountry = 'Select a Country';
+  String? selectedCity;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCountries();
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget regNow() {
@@ -61,25 +121,6 @@ class _SignupState extends State<Signup> {
       );
     }
 
-    List<String> countries = [];
-    List<String> cities = [];
-    String selectedCountry = 'Select a Country';
-    String? selectedCity;
-    Future<void> _loadCountries() async {
-      final loadedCountries = await CityService.getCountries();
-      setState(() {
-        countries = loadedCountries;
-      });
-    }
-
-    // Create a new Firestore document for the user
-
-    @override
-    void initState() {
-      super.initState();
-      _loadCountries();
-    }
-
     Color usernameBorderColor = Colors.grey; // Default border color
     Color emailBorderColor = Colors.grey; // Default border color
 
@@ -87,11 +128,7 @@ class _SignupState extends State<Signup> {
       showDialog(
           context: context,
           builder: (context) {
-            return Center(
-              child: RiveAnimation.asset(
-                'assets/load.riv',
-              ),
-            );
+            return Center(child: CircularProgressIndicator());
           });
       if (fullName.text.isEmpty) {
         isValid = false;
@@ -118,9 +155,10 @@ class _SignupState extends State<Signup> {
           final data = json.decode(response.body);
           print(code);
           if (code == 200) {
-            //Navigator.push(
-            //  context, MaterialPageRoute(builder: (context) => AuthPage()));
-            //runApp(MyApp());
+            await auth.PasswordlessSignIn();
+            await Navigator.push(
+                context, MaterialPageRoute(builder: (context) => AuthPage()));
+            //await runApp(MyApp());
             print(code);
           } else if (code == 404) {
             Fluttertoast.showToast(
@@ -165,23 +203,6 @@ class _SignupState extends State<Signup> {
       }
     }
 
-    Future<void> _loadCitiesByCountry(String country) async {
-      final loadedCities = await CityService.getCitiesByCountry(country);
-      setState(() {
-        cities = loadedCities;
-        selectedCity = 'Select a City';
-      });
-    }
-
-    void _onCountryChanged(String? country) {
-      if (country != null) {
-        setState(() {
-          selectedCountry = country;
-          _loadCitiesByCountry(country);
-        });
-      }
-    }
-
     void _onCityChanged(String? city) {
       if (city != null) {
         setState(() {
@@ -211,79 +232,74 @@ class _SignupState extends State<Signup> {
 
     void onContinue() async {
       showModalBottomSheet(
+        elevation: 0,
         context: context,
         backgroundColor: Colors.transparent,
         //isDismissible: false,
         builder: (context) {
-          return BackdropFilter(
-            filter: ImageFilter.blur(
-              sigmaX: 10.0,
-              sigmaY: 10.0,
-            ), // Adjust blur intensity
-            child: Container(
-              //height: double.infinity, // Define the height here
-              decoration: ShapeDecoration(
-                color: Color(0x598478F9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      topRight: Radius.circular(50)),
-                ),
+          return Container(
+            height: 490, // Define the height here
+            decoration: ShapeDecoration(
+              color: Color.fromARGB(255, 255, 255, 255),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(0), topRight: Radius.circular(0)),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CountryInputWidget(
-                      onCountrySelected: (selectedCountry) {
-                        // Update the value of the external widget here
-                        setState(() {
-                          city = selectedCountry;
-                        });
-                      },
-                    ),
-                    SizedBox(
-                      height: 21,
-                    ),
-                    NeumorphicInputField(
-                      controller: this.fullName,
-                      hintText: "Full Name",
-                      toggleShowPassword: toggleShowPassword,
-                      isdarkMode: isdarkMode,
-                      isPassword: false,
-                      borderColor: Colors.transparent,
-                      TheIcon: Icons.text_fields,
-                    ),
-                    SizedBox(
-                      height: 21,
-                    ),
-                    NeumorphicInputField(
-                      controller: this.username,
-                      hintText: "Username",
-                      toggleShowPassword: toggleShowPassword,
-                      borderColor: emailBorderColor,
-                      isdarkMode: isdarkMode,
-                      isPassword: false,
-                      TheIcon: Icons.person,
-                    ),
-                    SizedBox(height: 10),
-                    NeumorphicButton(
-                      onPressed: () {
-                        signUserUp();
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AuthPage(),
-                          ),
-                        );
-                      },
-                      text: "Sign Up",
-                      isdarkMode: isdarkMode,
-                    ),
-                  ],
-                ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: ListView(
+                children: [
+                  CountryInputWidget(
+                    countries: countries,
+                    onCountrySelected: (selectedCountry) {
+                      // Update the value of the external widget here
+                      setState(() {
+                        city = selectedCountry;
+                      });
+                    },
+                  ),
+                  SizedBox(
+                    height: 21,
+                  ),
+                  NeumorphicInputField(
+                    controller: this.fullName,
+                    hintText: "Full Name",
+                    toggleShowPassword: toggleShowPassword,
+                    isdarkMode: isdarkMode,
+                    isPassword: false,
+                    borderColor: Colors.transparent,
+                    TheIcon: Icons.text_fields,
+                  ),
+                  SizedBox(
+                    height: 21,
+                  ),
+                  NeumorphicInputField(
+                    controller: this.username,
+                    hintText: "Username",
+                    toggleShowPassword: toggleShowPassword,
+                    borderColor: emailBorderColor,
+                    isdarkMode: isdarkMode,
+                    isPassword: false,
+                    TheIcon: Icons.person,
+                  ),
+                  SizedBox(height: 10),
+                  NeumorphicButton(
+                    onPressed: () {
+                      signUserUp();
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AuthPage(),
+                        ),
+                      );
+                    },
+                    text: "Sign Up",
+                    isdarkMode: isdarkMode,
+                  ),
+                  SizedBox(height: 15)
+                ],
               ),
             ),
           );
@@ -366,7 +382,7 @@ class _SignupState extends State<Signup> {
                 isdarkMode: isdarkMode,
               ),
             ),
-
+            SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -378,6 +394,8 @@ class _SignupState extends State<Signup> {
                 regNow(),
               ],
             ),
+
+            SizedBox(height: 15)
           ],
         ),
       ),

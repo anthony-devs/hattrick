@@ -236,7 +236,7 @@ class NeumorphicButton extends StatelessWidget {
           width: 238,
           height: 50,
           decoration: ShapeDecoration(
-            color: Color(0xFFAF89F6),
+            color: Color(0x5B89E2F6),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -254,41 +254,40 @@ class NeumorphicButton extends StatelessWidget {
 }
 
 class CountryInputWidget extends StatefulWidget {
-  final Function(String?) onCountrySelected; // Callback function
-
-  CountryInputWidget({required this.onCountrySelected});
+  final Function(String?) onCountrySelected;
+  List<Map<String, dynamic>> countries = [];
+  CountryInputWidget(
+      {required this.onCountrySelected, required this.countries});
 
   @override
   _CountryInputWidgetState createState() => _CountryInputWidgetState();
 }
 
 class _CountryInputWidgetState extends State<CountryInputWidget> {
-  List<Country> countries = [];
-  String? selectedCountry; // Initialize as null to represent no selection
+  List<String> stringCountries = [
+    "Nigeria",
+    "Ghana",
+    "Niger",
+    "RSA",
+    "Botswana",
+    "USA",
+    "Canada",
+    "GB",
+    "Israel",
+    "Egypt",
+    "Germany",
+    "Benin",
+    "Togo",
+    "Gambia",
+    "Senegal",
+    "Angola",
+    "Tunisia"
+  ];
+  String? selectedCountry;
 
   @override
   void initState() {
     super.initState();
-    fetchCountries();
-  }
-
-  Future<void> fetchCountries() async {
-    final response =
-        await http.get(Uri.parse('https://restcountries.com/v3.1/all'));
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      setState(() {
-        countries = data
-            .map((countryData) => Country(
-                  name: countryData['name']['common'],
-                  flag: countryData['flags']['png'],
-                ))
-            .toList();
-      });
-    } else {
-      throw Exception('Failed to load countries');
-    }
   }
 
   @override
@@ -302,32 +301,34 @@ class _CountryInputWidgetState extends State<CountryInputWidget> {
             value: selectedCountry,
             onChanged: (String? newValue) {
               setState(() {
-                selectedCountry = newValue; // Update selectedCountry
-                widget
-                    .onCountrySelected(newValue); // Call the callback function
+                selectedCountry = newValue;
+                widget.onCountrySelected(newValue);
               });
             },
             items: [
               DropdownMenuItem<String>(
-                value: "Select One", // Add a default value
+                value: "Select One",
                 child: Text("Select One"),
               ),
-              for (Country country in countries)
+              for (Map<String, dynamic> country in widget.countries)
                 DropdownMenuItem<String>(
-                  value: country.name,
+                  value: country['name']
+                      .toString()
+                      .replaceAll("Outlying Islands", ""),
                   child: Container(
                     width: 210,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
+                    child: Row(
                       children: [
                         Image.network(
-                          country.flag,
+                          country['flag'],
                           width: 20,
                           height: 10,
                         ),
                         SizedBox(width: 5),
                         Text(
-                          country.name,
+                          country['name']!
+                              .toString()
+                              .replaceAll("Outlying Islands", ""),
                           maxLines: 3,
                           overflow: TextOverflow.fade,
                           style: GoogleFonts.poppins(),
@@ -337,7 +338,7 @@ class _CountryInputWidgetState extends State<CountryInputWidget> {
                   ),
                 ),
             ],
-          ), // Display the selected country or "No country selected" if null
+          ),
         ],
       ),
     );

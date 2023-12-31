@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rive/rive.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:delayed_widget/delayed_widget.dart';
 import 'Home.dart';
@@ -43,7 +42,7 @@ class _AuthPageState extends State<AuthPage> {
           // While the Future is still running, return a loading indicator or something else
 
           return Scaffold(
-            body: Column(children: [RiveAnimation.asset('assets/load.riv')]),
+            body: Column(children: [CircularProgressIndicator()]),
           );
         } else if (snapshot.hasError) {
           // If there was an error during the Future execution

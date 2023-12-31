@@ -12,7 +12,12 @@ class QuizUploader extends StatelessWidget {
       var excel = Excel.decodeBytes(bytes);
 
       for (var table in excel.tables.keys) {
-        for (var row in excel.tables[table]!.rows) {
+        var rows = excel.tables[table]!.rows;
+
+        // Skip the first row (header/identifier)
+        for (var i = 1; i < rows.length; i++) {
+          var row = rows[i];
+
           String question = row[0]!.value.toString();
           String correctAnswer = row[1]!.value.toString();
           List<String> options = List<String>.from(
@@ -51,7 +56,7 @@ class QuizUploader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Firestore Quiz Uploader')),
+      appBar: AppBar(title: Text('Quiz Uploader')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

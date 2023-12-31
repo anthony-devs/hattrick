@@ -7,7 +7,7 @@ import 'package:hattrick/Homepage.dart';
 import 'package:hattrick/Models/user.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:rive/rive.dart';
+
 import 'package:wakelock/wakelock.dart';
 
 import '../Models/quiz.dart';
@@ -203,74 +203,137 @@ class _QuizPageState extends State<QuizPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          elevation: 0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: Colors.white,
           content: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20), color: Colors.white),
-              width: 340,
-              height: 420,
+              height: 220,
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.only(
+                    left: 15, right: 15, top: 36, bottom: 5),
                 child: ListView(children: [
-                  Text(score < 9 ? "Game Finished" : "You Are A Winner",
-                      style: GoogleFonts.poppins(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                      )),
-                  SizedBox(height: 4),
-                  Container(
-                    height: 128,
-                    width: 128,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage(score < 9
-                              ? "assets/failed.jpg"
-                              : "assets/fullscore.jpg")),
-                      color: Color.fromARGB(255, 228, 228, 228),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(),
-                  ),
-                  Container(
-                    child: Column(textDirection: TextDirection.ltr, children: [
-                      Text(score < 9 ? score.toString() : "What A Shot!!!",
-                          style: GoogleFonts.poppins(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          )),
+                  Row(
+                    children: [
                       Text(
-                        score < 9 ? 'Practice More!!!' : 'You Are A Winner!!!',
+                        widget.type
+                            .toString()
+                            .split("_")
+                            .join(' ')
+                            .split('.')
+                            .join('')
+                            .replaceAll('QuizType', ''),
                         style: GoogleFonts.poppins(
-                          color: Colors.black,
-                          fontSize: 24,
+                          color: Colors.black.withOpacity(0.7300000190734863),
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          width: 238,
-                          height: 50,
-                          decoration: ShapeDecoration(
-                            color: Color(0xFFAF89F6),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Continue',
-                              style: TextStyle(
-                                color: Color(0xFF322653),
-                                fontSize: 15,
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.w600,
-                                height: 0,
+                      Spacer(),
+                      Text(
+                        '${score}/10',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          color: Colors.black.withOpacity(0.7699999809265137),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 23),
+                  //Container(
+                  //height: 128,
+                  // width: 128,
+                  //decoration: BoxDecoration(
+                  //image: DecorationImage(
+                  //  image: AssetImage(score < 9
+                  //    ? "assets/failed.jpg"
+                  //  : "assets/fullscore.jpg")),
+                  //color: Color.fromARGB(255, 228, 228, 228),
+                  //shape: BoxShape.circle,
+                  //),
+                  //child: Center(),
+                  //),
+                  SizedBox(height: 27),
+                  Container(
+                    child: Column(children: [
+                      Text(
+                        widget.type == QuizType.Super_League
+                            ? 'Keep Playing To Be at The Top'
+                            : score > 9
+                                ? "Congrats, You Just Won N10,000"
+                                : "Practice More",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 45),
+                      Column(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              width: 134,
+                              height: 50,
+                              decoration: ShapeDecoration(
+                                color: Color(0xA589E2F6),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Back To Home',
+                                  style: GoogleFonts.poppins(
+                                    color: Color(0xFF322653),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                          SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (BuildContext context) =>
+                                        new QuizPage(
+                                      type: widget.type,
+                                    ),
+                                  ));
+                            },
+                            child: Container(
+                              width: 134,
+                              height: 50,
+                              decoration: ShapeDecoration(
+                                color: Color(0xA589A0F6),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Play Again',
+                                  style: GoogleFonts.poppins(
+                                    color: Color(0xFF322653),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
                       )
                     ]),
                   )
@@ -303,10 +366,7 @@ class _QuizPageState extends State<QuizPage> {
     return Scaffold(
       backgroundColor: Color(0xFFF0F8FB),
       body: questions.length < 10
-          ? Center(
-              child: RiveAnimation.asset(
-              'assets/load.riv',
-            ))
+          ? Center(child: CircularProgressIndicator())
           : Container(
               color: Color.fromARGB(255, 240, 248, 251),
               //padding: const EdgeInsets.all(20.0),

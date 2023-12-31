@@ -8,8 +8,7 @@ import 'package:hattrick/Pages/Quizpage.dart';
 import 'package:hattrick/VisitProfile.dart';
 import 'package:hattrick/main.dart';
 import 'package:intl/intl.dart';
-import 'package:rive/rive.dart';
-import 'package:rive_loading/rive_loading.dart';
+
 import 'Homepage.dart';
 import 'LeadHome.dart';
 import 'Models/user.dart';

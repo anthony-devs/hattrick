@@ -73,8 +73,8 @@ class HattrickAuth {
       // You can now access the 'username' data from local storage like this:
       final savedUsername = preferences.getString('username');
       print('Username from local storage: $savedUsername');
-      Login(email, password);
-      this.PasswordlessSignIn();
+      await Login(email, password);
+      //this.PasswordlessSignIn();
     } else {
       throw Exception('Failed to load data');
     }
@@ -154,7 +154,7 @@ class HattrickAuth {
           super_points: data['super_points'],
           username: data['username'],
           played: data['played']);
-      this.PasswordlessSignIn();
+      await this.PasswordlessSignIn();
 
       return 200;
     } else if (response.statusCode == 404) {

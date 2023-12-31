@@ -11,9 +11,14 @@ class LoginOrRegister extends StatefulWidget {
   _LoginOrRegisterState createState() => _LoginOrRegisterState();
 }
 
+// ... (Your existing imports and class definitions)
+
 class _LoginOrRegisterState extends State<LoginOrRegister> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPage = 0;
+  final pageCount = 4; // Total number of pages
+
+  bool _isMouseOver = false;
 
   @override
   void dispose() {
@@ -22,26 +27,12 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
   }
 
   void _onPageChanged(int index) {
-    if (_pageController.hasClients) {
-      final pageCount = 3;
-      final newIndex = index.clamp(0, pageCount - 1);
+    final newIndex = index.clamp(0, pageCount - 1);
+    if (_currentPage != newIndex) {
       setState(() {
         _currentPage = newIndex;
       });
-      _pageController.jumpToPage(newIndex);
     }
-  }
-
-  Widget _buildPageIndicator(int pageIndex) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4.0),
-      width: 8.0,
-      height: 8.0,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: pageIndex == _currentPage ? Colors.blue : Colors.grey,
-      ),
-    );
   }
 
   @override
@@ -51,32 +42,121 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
       body: Padding(
         padding: const EdgeInsets.only(left: 20.0, right: 20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               child: kIsWeb
-                  ? GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onHorizontalDragEnd: (details) {
-                        if (_pageController.hasClients) {
-                          final currentPage = _pageController.page ?? 0;
-                          final velocity = details.velocity.pixelsPerSecond.dx;
-                          final newIndex = velocity > 0
-                              ? currentPage.floor() - 1
-                              : currentPage.ceil() + 1;
-                          _onPageChanged(newIndex);
-                        }
+                  ? MouseRegion(
+                      onEnter: (_) {
+                        // Enable scrolling on web when the mouse enters the widget
+                        setState(() {
+                          _isMouseOver = true;
+                        });
                       },
-                      child: PageView(
-                        controller: _pageController,
-                        onPageChanged: (index) {
-                          _onPageChanged(index);
+                      onExit: (_) {
+                        // Disable scrolling on web when the mouse exits the widget
+                        setState(() {
+                          _isMouseOver = false;
+                        });
+                      },
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onHorizontalDragEnd: (details) {
+                          if (_isMouseOver && _pageController.hasClients) {
+                            final currentPage = _pageController.page ?? 0;
+                            final velocity =
+                                details.velocity.pixelsPerSecond.dx;
+                            final newIndex = velocity > 0
+                                ? currentPage.floor() - 1
+                                : currentPage.ceil() + 1;
+                            _onPageChanged(newIndex);
+                            if (newIndex == pageCount) {
+                              // If the user swipes from the last page, jump to the first page
+                              _pageController.jumpToPage(0);
+                            }
+                          }
                         },
-                        children: [
-                          Page1(),
-                          Page2(),
-                          Page3(),
-                        ],
+                        child: PageView(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            _onPageChanged(index);
+                          },
+                          children: [
+                            Center(
+                              child: Column(children: [
+                                SizedBox(height: 90),
+                                Image.asset(
+                                  "assets/logo.PNG",
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 210,
+                                ),
+                                Text(
+                                  'Hattrick',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              ]),
+                            ),
+                            Center(
+                              child: Column(children: [
+                                SizedBox(height: 62),
+                                Image.asset(
+                                  "assets/SplashScreen/quiz.png",
+                                  width: 290,
+                                ),
+                                Text(
+                                  'Quiz',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              ]),
+                            ),
+                            Center(
+                              child: Column(children: [
+                                SizedBox(height: 140),
+                                Image.asset(
+                                  "assets/SplashScreen/win.png",
+                                  width: 290,
+                                ),
+                                Text(
+                                  'Win',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              ]),
+                            ),
+                            Center(
+                              child: Column(children: [
+                                SizedBox(height: 65),
+                                Image.asset(
+                                  "assets/SplashScreen/payment.png",
+                                  width: 290,
+                                  height: 234.97,
+                                ),
+                                Text(
+                                  'Earn',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              ]),
+                            ),
+                          ],
+                        ),
                       ),
                     )
                   : PageView(
@@ -85,23 +165,87 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
                         _onPageChanged(index);
                       },
                       children: [
-                        Page1(),
-                        Page2(),
-                        Page3(),
+                        Center(
+                          child: Column(children: [
+                            SizedBox(height: 90),
+                            Image.asset(
+                              "assets/logo.PNG",
+                              width: MediaQuery.of(context).size.width,
+                              height: 210,
+                            ),
+                            Text(
+                              'Hattrick',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 48,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            )
+                          ]),
+                        ),
+                        Center(
+                          child: Column(children: [
+                            SizedBox(height: 65),
+                            Image.asset(
+                              "assets/SplashScreen/quiz.png",
+                              width: 240,
+                            ),
+                            Text(
+                              'Quiz',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            )
+                          ]),
+                        ),
+                        Center(
+                          child: Column(children: [
+                            SizedBox(height: 130),
+                            Image.asset(
+                              "assets/SplashScreen/win.png",
+                              width: 290,
+                            ),
+                            Text(
+                              'Win',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            )
+                          ]),
+                        ),
+                        Center(
+                          child: Column(children: [
+                            SizedBox(height: 90),
+                            Image.asset(
+                              "assets/SplashScreen/payment.png",
+                              width: 290,
+                              height: 234.97,
+                            ),
+                            Text(
+                              'Earn',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            )
+                          ]),
+                        ),
                       ],
                     ),
             ),
             SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                3, // Number of pages
-                (index) => _buildPageIndicator(index),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(30.0),
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -110,50 +254,57 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                Login()), // Navigate to Login page
+                          builder: (context) => Signup(),
+                        ),
                       );
                     },
-                    child: Center(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width / 4,
-                        height: 54,
-                        child: Center(
-                            child: Text("Log In",
-                                style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.black))),
-                        decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 218, 221, 216),
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                bottomLeft: Radius.circular(10))),
+                    child: Container(
+                      width: 219.41,
+                      height: 64,
+                      decoration: ShapeDecoration(
+                        color: Color(0xFF89E2F6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Register",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w800,
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  SizedBox(width: 18),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                Signup()), // Navigate to Register page
+                          builder: (context) => Login(),
+                        ),
                       );
                     },
                     child: Container(
-                      width: MediaQuery.of(context).size.width / 4,
-                      height: 54,
+                      width: 219.41,
+                      height: 64,
+                      decoration: ShapeDecoration(
+                        color: Color(0xFF89E2F6).withOpacity(0.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
                       child: Center(
-                          child: Text("Register",
-                              style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.black))),
-                      decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 244, 235, 175),
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(10),
-                              bottomRight: Radius.circular(10))),
+                        child: Text(
+                          "Login",
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFFEA8843),
+                          ),
+                        ),
+                      ),
                     ),
                   )
                 ],
@@ -166,95 +317,4 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
   }
 }
 
-class Page1 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        Center(
-            child: Text(" Earn While \n You Play",
-                style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 36),
-                textAlign: TextAlign.center)),
-        SizedBox(height: 65),
-        Center(
-            child: Text(
-          " Get Awesome rewards for \n answering questions on events \n that have already happened",
-          style: GoogleFonts.poppins(
-              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
-          textAlign: TextAlign.center,
-        )),
-        SizedBox(height: 46),
-        Image.asset(
-          'assets/SplashScreen/payment.png',
-          width: 246,
-          height: 224,
-        ),
-      ],
-    );
-  }
-}
-
-class Page2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        Center(
-            child: Text(" Compete \n Globally",
-                style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 36),
-                textAlign: TextAlign.center)),
-        SizedBox(height: 65),
-        Center(
-            child: Text(
-          " Compete with users all over \n the world and win big weekly. ",
-          style: GoogleFonts.poppins(
-              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
-          textAlign: TextAlign.center,
-        )),
-        SizedBox(height: 46),
-        Image.asset(
-          'assets/SplashScreen/earth.png',
-          width: 246,
-          height: 246,
-        ),
-      ],
-    );
-  }
-}
-
-class Page3 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        Center(
-            child: Text(" Earn \n Privately",
-                style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 36),
-                textAlign: TextAlign.center)),
-        SizedBox(height: 65),
-        Center(
-            child: Text(
-          " As a human, your privacy matters \n so we have decided to cut down \n information that is being \n collected from you ",
-          style: GoogleFonts.poppins(
-              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
-          textAlign: TextAlign.center,
-        )),
-        SizedBox(height: 46),
-        Image.asset(
-          'assets/SplashScreen/secure.png',
-          width: 246,
-          height: 246,
-        ),
-      ],
-    );
-  }
-}
+// ... (Your existing classes)

@@ -2,12 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_paystack/flutter_paystack.dart';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hattrick/CoinPacksPage.dart';
 import 'package:hattrick/Models/user.dart';
-import 'package:hattrick/services/paystack_integration.dart';
+//import 'package:hattrick/services/paystack_integration.dart';
 
 class BuyCoins extends StatefulWidget {
   final coins = TextEditingController();
@@ -20,17 +20,9 @@ class BuyCoins extends StatefulWidget {
 }
 
 class _BuyCoinsState extends State<BuyCoins> {
-  final payStackClient = PaystackPlugin();
-
-  void _startPaystack() async {
-    payStackClient.initialize(
-        publicKey: "pk_live_6ad9b26c3ba1dba6c7d16a945f8bb635370b9b7e");
-  }
-
   @override
   void initState() {
     super.initState();
-    _startPaystack();
   }
 
   String generateRef() {
@@ -39,17 +31,17 @@ class _BuyCoinsState extends State<BuyCoins> {
   }
 
   void _makePayment(price) async {
-    await PaystackPopup.openPaystackPopup(
-      email: widget.auth.currentuser!.email.toString(),
-      amount: price.toString(),
-      ref: generateRef(),
-      onClosed: () {
-        showInfo("Payment Failed", Colors.red);
-      },
-      onSuccess: () {
-        showInfo("Payment Succesful", Colors.greenAccent);
-      },
-    );
+    //await PaystackPopup.openPaystackPopup(
+    //email: widget.auth.currentuser!.email.toString(),
+    //amount: price.toString(),
+    //ref: generateRef(),
+    //onClosed: () {
+    //showInfo("Payment Failed", Colors.red);
+    //  },
+    //onSuccess: () {
+    //showInfo("Payment Succesful", Colors.greenAccent);
+    //},
+    //);
   }
 
   @override
@@ -62,12 +54,12 @@ class _BuyCoinsState extends State<BuyCoins> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("Buy ${widget.pack.coins} Coins"),
-            Text("₦ ${widget.pack.price / 100}"),
+            Text("\u20A6 ${widget.pack.price / 100}"),
             SizedBox(height: 20),
             GestureDetector(
                 child: Card(
                   margin: EdgeInsets.symmetric(horizontal: 10),
-                  color: Color(0xFFAF89F6),
+                  color: Color(0x5B89E2F6),
                   elevation: 0,
                   child: Container(
                     height: 100,
@@ -93,7 +85,8 @@ class _BuyCoinsState extends State<BuyCoins> {
                 onTap: () async {
                   final String reference =
                       "unique_transaction_ref_${Random().nextInt(1000000)}";
-                  _makePayment(widget.pack.price);
+                  //_makePayment(widget.pack.price);
+                  showInfo("Feature not Available", Colors.deepOrange);
                 }),
             SizedBox(height: 42),
             GestureDetector(

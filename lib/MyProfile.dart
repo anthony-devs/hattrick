@@ -9,8 +9,7 @@ import 'package:hattrick/Pages/Quizpage.dart';
 import 'package:hattrick/VisitProfile.dart';
 import 'package:hattrick/main.dart';
 import 'package:intl/intl.dart';
-import 'package:rive/rive.dart';
-import 'package:rive_loading/rive_loading.dart';
+
 import 'CoinPacksPage.dart';
 import 'Homepage.dart';
 import 'LeadHome.dart';
@@ -81,15 +80,113 @@ class _MyProfileState extends State<MyProfile> {
     super.dispose();
   }
 
+  void ShowLogOut() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            content: Container(
+              height: 147,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.all(30),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Color(0xFF161616)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Are You Sure You Want to Log Out?',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 23),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: 72,
+                          height: 22,
+                          decoration: BoxDecoration(
+                              color: Color(0xFF1D1D1D),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Center(
+                            child: Text(
+                              'No',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          auth.logOut();
+                          print("Werey wan log out");
+                          runApp(MyApp());
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) => AuthPage(),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          width: 72,
+                          height: 22,
+                          decoration: BoxDecoration(
+                              color: Color(0xFFFFD2D7),
+                              borderRadius: BorderRadius.circular(30)),
+                          child: Center(
+                            child: Text(
+                              'Yes',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = auth.currentuser;
+    Locale locale = Localizations.localeOf(context);
+    var format =
+        NumberFormat.simpleCurrency(locale: Platform.localeName, name: 'NGN');
     final formatter = NumberFormat('#,###,###,###,###,###');
+    String balance =
+        "${format.currencySymbol} ${auth.currentuser!.earning_balance}";
+    final user = auth.currentuser;
     print(flag);
     if (user != null) {
       return Scaffold(
         body: Padding(
-          padding: const EdgeInsets.only(left: 47.0, right: 47.0),
+          padding: const EdgeInsets.only(left: 15.0, right: 15.0),
           child: ListView(children: [
             SizedBox(height: 75),
             Row(
@@ -148,7 +245,7 @@ class _MyProfileState extends State<MyProfile> {
             ),
             SizedBox(height: 21),
             Text(
-              user!.FullName.toString(),
+              user.FullName.toString(),
               style: GoogleFonts.poppins(
                 color: Colors.black,
                 fontSize: 24,
@@ -176,6 +273,8 @@ class _MyProfileState extends State<MyProfile> {
               ),
               child: Center(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
                       auth.currentuser!.played.toString(),
@@ -205,7 +304,7 @@ class _MyProfileState extends State<MyProfile> {
                 padding: EdgeInsets.all(21),
                 height: 150,
                 decoration: ShapeDecoration(
-                  color: Color(0xFFAF89F6),
+                  color: Color(0x5B89E2F6),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -216,25 +315,20 @@ class _MyProfileState extends State<MyProfile> {
                       ? [
                           SizedBox(height: 21.72),
                           //This one fi cause error
-                          Center(
-                            child: SizedBox(
-                                width: 178,
-                                height: 43.27,
-                                child: Text('Get Verified To Start Earning',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.poppins(
-                                      color: Color(0xFFAF89F6),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ))),
-                          ),
-                          SizedBox(height: 24),
+                          Text('Get Verified To Start Earning',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.poppins(
+                                color: Color.fromARGB(255, 255, 255, 255),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              )),
+                          SizedBox(height: 18),
                           GestureDetector(
                             child: Container(
                               width: 98.88,
                               height: 28,
                               decoration: ShapeDecoration(
-                                color: Color(0xFFAF89F6),
+                                color: Color.fromARGB(91, 255, 255, 255),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(50),
                                 ),
@@ -262,7 +356,7 @@ class _MyProfileState extends State<MyProfile> {
                           Container(
                             width: 178,
                             child: Text(
-                              "₦ ${formatter.format(auth.currentuser!.earning_balance)}",
+                              balance,
                               style: GoogleFonts.poppins(
                                 color: Colors.black,
                                 fontSize: 14,
@@ -365,6 +459,36 @@ class _MyProfileState extends State<MyProfile> {
                     ),
                   ],
                 )),
+            SizedBox(height: 35),
+            GestureDetector(
+              onTap: () {
+                ShowLogOut();
+              },
+              child: Center(
+                  child: Container(
+                width: 150,
+                height: 40,
+                decoration: ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      width: 1,
+                      color: Colors.deepOrange,
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: Center(
+                  child: Text(
+                    "Log Out",
+                    style: GoogleFonts.poppins(
+                      color: Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              )),
+            ),
             SizedBox(
               height: 105,
             )
@@ -374,10 +498,7 @@ class _MyProfileState extends State<MyProfile> {
     } else {
       return Scaffold(
           backgroundColor: Colors.black,
-          body: Center(
-              child: RiveAnimation.asset(
-            'assets/load.riv',
-          )));
+          body: Center(child: CircularProgressIndicator()));
     }
   }
 }
