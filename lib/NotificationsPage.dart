@@ -9,14 +9,14 @@ import 'Homepage.dart';
 import 'Models/user.dart';
 
 class Notifications extends StatefulWidget {
-  const Notifications({super.key});
+  HattrickAuth auth;
+  Notifications({super.key, required this.auth});
 
   @override
   State<Notifications> createState() => _NotificationsState();
 }
 
 class _NotificationsState extends State<Notifications> {
-  final auth = HattrickAuth();
   List<News> news = [];
   bool isMounted = false;
 
@@ -24,11 +24,7 @@ class _NotificationsState extends State<Notifications> {
   void initState() {
     super.initState();
     isMounted = true; // Set isMounted to true when the widget is mounted
-    auth.PasswordlessSignIn().then((_) {
-      if (isMounted) {
-        setState(() {}); // Refresh the widget after sign-in.
-      }
-    });
+
     //_startPaystack();
     getNews();
   }
@@ -57,6 +53,7 @@ class _NotificationsState extends State<Notifications> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = widget.auth;
     return Scaffold(
       backgroundColor: Color(0xFF0B0B0B),
       appBar: AppBar(

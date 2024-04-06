@@ -3,12 +3,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hattrick/Models/user.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'Pages/signup.dart'; // Import the Login page
 import 'Pages/login.dart'; // Import the Register page
 
 class LoginOrRegister extends StatefulWidget {
+  HattrickAuth auth;
+  LoginOrRegister({required this.auth});
   @override
-  _LoginOrRegisterState createState() => _LoginOrRegisterState();
+  State<LoginOrRegister> createState() => _LoginOrRegisterState();
 }
 
 // ... (Your existing imports and class definitions)
@@ -44,38 +48,129 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
         child: Column(
           children: [
             Expanded(
-              child: kIsWeb
-                  ? MouseRegion(
-                      onEnter: (_) {
-                        // Enable scrolling on web when the mouse enters the widget
-                        setState(() {
-                          _isMouseOver = true;
-                        });
-                      },
-                      onExit: (_) {
-                        // Disable scrolling on web when the mouse exits the widget
-                        setState(() {
-                          _isMouseOver = false;
-                        });
-                      },
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onHorizontalDragEnd: (details) {
-                          if (_isMouseOver && _pageController.hasClients) {
-                            final currentPage = _pageController.page ?? 0;
-                            final velocity =
-                                details.velocity.pixelsPerSecond.dx;
-                            final newIndex = velocity > 0
-                                ? currentPage.floor() - 1
-                                : currentPage.ceil() + 1;
-                            _onPageChanged(newIndex);
-                            if (newIndex == pageCount) {
-                              // If the user swipes from the last page, jump to the first page
-                              _pageController.jumpToPage(0);
-                            }
-                          }
+                child: kIsWeb
+                    ? MouseRegion(
+                        onEnter: (_) {
+                          // Enable scrolling on web when the mouse enters the widget
+                          setState(() {
+                            _isMouseOver = true;
+                          });
                         },
-                        child: PageView(
+                        onExit: (_) {
+                          // Disable scrolling on web when the mouse exits the widget
+                          setState(() {
+                            _isMouseOver = false;
+                          });
+                        },
+                        child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onHorizontalDragEnd: (details) {
+                              if (_isMouseOver && _pageController.hasClients) {
+                                final currentPage = _pageController.page ?? 0;
+                                final velocity =
+                                    details.velocity.pixelsPerSecond.dx;
+                                final newIndex = velocity > 0
+                                    ? currentPage.floor() - 1
+                                    : currentPage.ceil() + 1;
+                                _onPageChanged(newIndex);
+                                if (newIndex == pageCount) {
+                                  // If the user swipes from the last page, jump to the first page
+                                  _pageController.jumpToPage(0);
+                                }
+                              }
+                            },
+                            child: Stack(children: [
+                              PageView(
+                                controller: _pageController,
+                                onPageChanged: (index) {
+                                  _onPageChanged(index);
+                                },
+                                children: [
+                                  Center(
+                                    child: Column(children: [
+                                      SizedBox(height: 90),
+                                      Image.asset(
+                                        "assets/logo.PNG",
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        height: 210,
+                                      ),
+                                      Text(
+                                        'Hattrick',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 48,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      )
+                                    ]),
+                                  ),
+                                  Center(
+                                    child: Column(children: [
+                                      SizedBox(height: 62),
+                                      Image.asset(
+                                        "assets/SplashScreen/quiz.png",
+                                        width: 290,
+                                      ),
+                                      Text(
+                                        'Quiz',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      )
+                                    ]),
+                                  ),
+                                  Center(
+                                    child: Column(children: [
+                                      SizedBox(height: 140),
+                                      Image.asset(
+                                        "assets/SplashScreen/win.png",
+                                        width: 290,
+                                      ),
+                                      Text(
+                                        'Win',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      )
+                                    ]),
+                                  ),
+                                  Center(
+                                    child: Column(children: [
+                                      SizedBox(height: 65),
+                                      Image.asset(
+                                        "assets/SplashScreen/payment.png",
+                                        width: 290,
+                                        height: 234.97,
+                                      ),
+                                      Text(
+                                        'Earn',
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      )
+                                    ]),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                  alignment: Alignment(0, 0.75),
+                                  child: SmoothPageIndicator(
+                                      controller: _pageController, count: 4))
+                            ])),
+                      )
+                    : Stack(children: [
+                        PageView(
                           controller: _pageController,
                           onPageChanged: (index) {
                             _onPageChanged(index);
@@ -157,91 +252,11 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
                             ),
                           ],
                         ),
-                      ),
-                    )
-                  : PageView(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        _onPageChanged(index);
-                      },
-                      children: [
-                        Center(
-                          child: Column(children: [
-                            SizedBox(height: 90),
-                            Image.asset(
-                              "assets/logo.PNG",
-                              width: MediaQuery.of(context).size.width,
-                              height: 210,
-                            ),
-                            Text(
-                              'Hattrick',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 48,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )
-                          ]),
-                        ),
-                        Center(
-                          child: Column(children: [
-                            SizedBox(height: 65),
-                            Image.asset(
-                              "assets/SplashScreen/quiz.png",
-                              width: 240,
-                            ),
-                            Text(
-                              'Quiz',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )
-                          ]),
-                        ),
-                        Center(
-                          child: Column(children: [
-                            SizedBox(height: 130),
-                            Image.asset(
-                              "assets/SplashScreen/win.png",
-                              width: 290,
-                            ),
-                            Text(
-                              'Win',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )
-                          ]),
-                        ),
-                        Center(
-                          child: Column(children: [
-                            SizedBox(height: 90),
-                            Image.asset(
-                              "assets/SplashScreen/payment.png",
-                              width: 290,
-                              height: 234.97,
-                            ),
-                            Text(
-                              'Earn',
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )
-                          ]),
-                        ),
-                      ],
-                    ),
-            ),
+                        Container(
+                            alignment: Alignment(0, 0.75),
+                            child: SmoothPageIndicator(
+                                controller: _pageController, count: 4))
+                      ])),
             SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.all(30.0),
@@ -254,7 +269,9 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Signup(),
+                          builder: (context) => Signup(
+                            auth: widget.auth,
+                          ),
                         ),
                       );
                     },
@@ -283,7 +300,9 @@ class _LoginOrRegisterState extends State<LoginOrRegister> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Login(),
+                          builder: (context) => Login(
+                            auth: widget.auth,
+                          ),
                         ),
                       );
                     },

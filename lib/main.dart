@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:hattrick/AuthPage.dart';
 import 'package:hattrick/Homepage.dart';
 import 'package:hattrick/Models/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Pages/Quizpage.dart';
 import 'Pages/login.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'Pages/quizupload.dart';
+import 'dart:async';
 //import 'firebase_options.dart';
 //import 'package:firebase_core/firebase_core.dart';
 //import 'package:awesome_notifications/awesome_notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
- 
-  
+
   final auth = HattrickAuth();
   runApp(MyApp());
 }
@@ -63,6 +64,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final auth = HattrickAuth();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<bool> checkUsername() async {
+    final preferences = await SharedPreferences.getInstance();
+    final uname = preferences.getString("username");
+    return uname!.isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done

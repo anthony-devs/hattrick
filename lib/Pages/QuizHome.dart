@@ -25,7 +25,8 @@ import '../LeaderBoardwAppbar.dart';
 import '../Models/user.dart';
 
 class QuizHome extends StatefulWidget {
-  const QuizHome({super.key});
+  HattrickAuth auth;
+  QuizHome({super.key, required this.auth});
 
   @override
   State<QuizHome> createState() => _QuizHomeState();
@@ -33,10 +34,11 @@ class QuizHome extends StatefulWidget {
 
 class _QuizHomeState extends State<QuizHome> {
   List<AUser> leads = [];
-  final auth = HattrickAuth();
+
   bool isMounted = false;
   @override
   void initState() {
+    final auth = widget.auth;
     super.initState();
     isMounted = true; // Set isMounted to true when the widget is mounted
     auth.PasswordlessSignIn().then((_) {
@@ -74,8 +76,9 @@ class _QuizHomeState extends State<QuizHome> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = widget.auth;
     return Scaffold(
-      backgroundColor: Color(0xFF1D1D1D),
+      backgroundColor: Color(0xFF0B0B0B),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -125,43 +128,33 @@ class _QuizHomeState extends State<QuizHome> {
                   SizedBox(height: 12),
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    height: 190,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30)),
+                    height: 180,
+                    decoration: BoxDecoration(color: Color(0xFFB4A9CC)),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 15),
                         Padding(
                           padding:
                               const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: Row(
-                            children: [
-                              Text("Super League",
-                                  textAlign: TextAlign.left,
-                                  style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 28)),
-                              Spacer()
-                            ],
-                          ),
+                          child: Text("Super League",
+                              textAlign: TextAlign.left,
+                              style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w800, fontSize: 28)),
                         ),
                         SizedBox(height: 8),
                         Padding(
                           padding:
                               const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: Text(
-                              "Join The League and stand a chance to win up to 10,000,000 Naira",
-                              textAlign: TextAlign.left,
-                              style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w300, fontSize: 14)),
-                        ),
-                        Padding(
-                          padding:
-                              const EdgeInsets.only(left: 16.0, right: 16.0),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Spacer(),
+                              Text(
+                                  "Join The League and stand a chance to win up to 10,000,000 Naira",
+                                  textAlign: TextAlign.left,
+                                  style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 14)),
                               GestureDetector(
                                 onTap: () async {
                                   if (auth.currentuser!.is_subscribed) {
@@ -200,6 +193,7 @@ class _QuizHomeState extends State<QuizHome> {
                                         MaterialPageRoute<void>(
                                           builder: (BuildContext context) =>
                                               new QuizPage(
+                                            auth: auth,
                                             type: QuizType.Super_League,
                                           ),
                                         ),
@@ -210,26 +204,19 @@ class _QuizHomeState extends State<QuizHome> {
                                   }
                                 },
                                 child: Container(
-                                  height: 45,
-                                  decoration: BoxDecoration(
-                                      color: Color.fromARGB(91, 0, 0, 0),
-                                      borderRadius: BorderRadius.circular(30)),
+                                  width: 121,
+                                  height: 34,
+                                  decoration:
+                                      BoxDecoration(color: Color(0xFF0B0B0B)),
                                   child: Center(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 12.0,
-                                          bottom: 12.0,
-                                          left: 24,
-                                          right: 24),
-                                      child: Text(
-                                        auth.currentuser!.is_subscribed
-                                            ? "Play"
-                                            : "Subscribe To Join",
-                                        style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 14,
-                                            color: Colors.white),
-                                      ),
+                                    child: Text(
+                                      auth.currentuser!.is_subscribed
+                                          ? "Play"
+                                          : "Subscribe To Join",
+                                      style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14,
+                                          color: Colors.white),
                                     ),
                                   ),
                                 ),
@@ -245,15 +232,18 @@ class _QuizHomeState extends State<QuizHome> {
                     width: MediaQuery.of(context).size.width,
                     height: 150,
                     padding: EdgeInsets.only(
-                        left: 12.0, right: 12.0, top: 8.0, bottom: 12.0),
+                        left: 25.0, right: 12.0, top: 8.0, bottom: 12.0),
                     decoration: ShapeDecoration(
-                      color: Colors.black,
+                      color: Color(0xFF151515),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(0),
                       ),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        //SizedBox(height: 24),
                         Text(
                           'Practice Play',
                           style: GoogleFonts.poppins(
@@ -276,8 +266,8 @@ class _QuizHomeState extends State<QuizHome> {
                                 width: 121,
                                 height: 34,
                                 decoration: BoxDecoration(
-                                    color: Color(0xFF89E2F6),
-                                    borderRadius: BorderRadius.circular(30)),
+                                    color: Color(0xFF717FC9),
+                                    borderRadius: BorderRadius.circular(0)),
                                 child: Center(
                                     child: Text(
                                   'Go',
@@ -322,6 +312,7 @@ class _QuizHomeState extends State<QuizHome> {
                                   MaterialPageRoute<void>(
                                     builder: (BuildContext context) =>
                                         new QuizPage(
+                                      auth: auth,
                                       type: QuizType.Practice_Play,
                                     ),
                                   ),
@@ -336,14 +327,16 @@ class _QuizHomeState extends State<QuizHome> {
                     width: MediaQuery.of(context).size.width,
                     height: 150,
                     padding: EdgeInsets.only(
-                        left: 12.0, right: 12.0, top: 8.0, bottom: 12.0),
+                        left: 25.0, right: 12.0, top: 8.0, bottom: 12.0),
                     decoration: ShapeDecoration(
-                      color: Colors.black,
+                      color: Color(0xFF151515),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(0),
                       ),
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'Master\'s Quiz',
@@ -367,8 +360,8 @@ class _QuizHomeState extends State<QuizHome> {
                                 width: 121,
                                 height: 34,
                                 decoration: BoxDecoration(
-                                    color: Color(0xFFAF89F6),
-                                    borderRadius: BorderRadius.circular(30)),
+                                    color: Color(0xFF717FC9),
+                                    borderRadius: BorderRadius.circular(0)),
                                 child: Center(
                                     child: Text(
                                   auth.currentuser!.is_subscribed
@@ -418,6 +411,7 @@ class _QuizHomeState extends State<QuizHome> {
                                     MaterialPageRoute<void>(
                                       builder: (BuildContext context) =>
                                           new QuizPage(
+                                        auth: auth,
                                         type: QuizType.Masters_Game,
                                       ),
                                     ),
@@ -445,7 +439,9 @@ class _QuizHomeState extends State<QuizHome> {
                             context,
                             MaterialPageRoute<void>(
                               builder: (BuildContext context) =>
-                                  LeaderBoardBeta(),
+                                  LeaderBoardBeta(
+                                auth: auth,
+                              ),
                             ),
                           );
                         },

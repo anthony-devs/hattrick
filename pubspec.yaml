@@ -54,6 +54,8 @@ dependencies:
   #flutter_paystack_plus: ^0.0.4
   #flutter_paystack: ^1.0.0
   carousel_slider: ^4.2.1
+  connectivity_plus: ^5.0.2
+  smooth_page_indicator: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +83,15 @@ flutter:
       - assets/Homepage/coin.png
       - assets/load.riv
       - assets/logo.PNG
+      - assets/welcome.jpeg
+      - assets/created.jpeg
+      - assets/banner.jpeg
+      - assets/win.png
+      - assets/fire.png
+      - assets/xp.png
+      - assets/coin.png
+      - assets/cb.jpeg
+      - assets/bgq.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

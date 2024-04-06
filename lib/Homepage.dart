@@ -2,6 +2,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,27 +24,50 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
-
+import 'Models/quiz.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class League {
+  final int id;
+  final DateTime ends;
+  final int prize;
+  final List<String> players;
 
-  @override
-  State<HomePage> createState() => _HomePageState();
+  League(
+      {required this.id,
+      required this.ends,
+      required this.prize,
+      required this.players});
+
+  factory League.fromJson(Map<String, dynamic> json) {
+    return League(
+      id: json['id'],
+      ends: DateTime.parse(json['ends']),
+      prize: json['prize'],
+      players: List<String>.from(json['players']),
+    );
+  }
 }
 
 class AUser {
   final String username;
   final int superPoints;
+  final int hattricks;
+  final int practice_points;
   final String city;
 
   AUser(
-      {required this.username, required this.superPoints, required this.city});
+      {required this.username,
+      required this.superPoints,
+      required this.city,
+      required this.hattricks,
+      required this.practice_points});
 
   factory AUser.fromJson(Map<String, dynamic> json) {
     return AUser(
         username: json['username'],
+        hattricks: json['hattricks'],
+        practice_points: json['xp'],
         superPoints: json['super_points'],
         city: json['city']);
   }
@@ -62,63 +86,77 @@ class News {
 
 enum NewsTypes { Quiz, Practice, Masters, Super, News, Info }
 
+class HomePage extends StatefulWidget {
+  HattrickAuth auth;
+  HomePage({super.key, required this.auth});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
 class _HomePageState extends State<HomePage> {
-  final auth = HattrickAuth();
-  List<AUser> leads = [];
-  List<News> news = [];
-  bool isMounted = false;
-
-  @override
-  void initState() {
-    super.initState();
-    isMounted = true; // Set isMounted to true when the widget is mounted
-    auth.PasswordlessSignIn().then((_) {
-      if (isMounted) {
-        setState(() {}); // Refresh the widget after sign-in.
-      }
-    });
-    //_startPaystack();
-    fetchUsers();
-    getNews();
-  }
-
-  @override
-  void dispose() {
-    isMounted = false; // Set isMounted to false when the widget is disposed
-    super.dispose();
-  }
-
-  void currency(context) {
-    Locale locale = Localizations.localeOf(context);
-
-    var format =
-        NumberFormat.simpleCurrency(locale: Platform.localeName, name: 'NGN');
-  }
-
-  Future<void> fetchUsers() async {
-    dynamic response = await http.get(Uri.parse(
-        'https://hattrick-server-production.up.railway.app//get-three'));
-
-    if (isMounted) {
-      // Check if the widget is still mounted
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-
-        setState(() {
-          leads = data.map((userJson) => AUser.fromJson(userJson)).toList();
-        });
-      } else {
-        throw Exception('Failed to load users');
-      }
+  String formatNumber(int number) {
+    if (number >= 1000 && number < 1000000) {
+      double result = number / 1000.0;
+      return '${result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 1)}k';
+    } else if (number >= 1000000) {
+      double result = number / 1000000.0;
+      return '${result.toStringAsFixed(result.truncateToDouble() == result ? 0 : 1)}M';
+    } else {
+      return number.toString();
     }
-    //while (true) {
-    //sleep(Duration(seconds: 15));
-    //fetchUsers();
-    //}
-
-    print("Got Users");
   }
 
+  String _formatDate(DateTime date) {
+    // Format the date to "Month day, year" format
+    return 'Ends ${_getMonthName(date.month)} ${date.day}, ${date.year}';
+  }
+
+  String _getMonthName(int month) {
+    // Convert month number to month name
+    switch (month) {
+      case 1:
+        return 'January';
+      case 2:
+        return 'February';
+      case 3:
+        return 'March';
+      case 4:
+        return 'April';
+      case 5:
+        return 'May';
+      case 6:
+        return 'June';
+      case 7:
+        return 'July';
+      case 8:
+        return 'August';
+      case 9:
+        return 'September';
+      case 10:
+        return 'October';
+      case 11:
+        return 'November';
+      case 12:
+        return 'December';
+      default:
+        return '';
+    }
+  }
+
+  List<League> leagues = [];
+
+  List<AUser> leads = [];
+  List<AUser> all_leads = [];
+  List<News>? news;
+  late Future<User?> _user;
+
+  Future<User?> userFuture() async {
+    User? user = widget.auth.currentuser;
+    return user;
+  }
+
+  bool isMounted = false;
   Future<void> getNews() async {
     dynamic response = await http.get(
         Uri.parse('https://hattrick-server-production.up.railway.app/news'));
@@ -128,13 +166,96 @@ class _HomePageState extends State<HomePage> {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
-        setState(() {
-          news = data.map((newsJson) => News.fromJson(newsJson)).toList();
-        });
+        news = data.map((newsJson) => News.fromJson(newsJson)).toList();
       } else {
         throw Exception('Failed to load news');
       }
     }
+    //while (true) {
+    //sleep(Duration(seconds: 15));
+    //fetchUsers();
+    //}
+  }
+
+  void fetchLeagues() async {
+    final response = await http.get(Uri.parse(
+        'https://hattrick-server-production.up.railway.app/get-leagues'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      setState(() {
+        leagues =
+            data.map((leagueData) => League.fromJson(leagueData)).toList();
+      });
+    } else {
+      throw Exception('Failed to load leagues');
+    }
+  }
+
+  late Timer _timer;
+  @override
+  void initState() {
+    super.initState();
+    isMounted = true; // Set isMounted to true when the widget is mounted
+    getNews();
+    fetchLeagues();
+    fetchUsers();
+    _startTimer();
+    isMounted = true; // Set isMounted to true when the widget is mounted
+    widget.auth.PasswordlessSignIn();
+    _user = userFuture();
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer when the widget is disposed
+    _timer.cancel();
+    isMounted = false; // Make sure to update isMounted
+    super.dispose();
+  }
+
+  void _startTimer() {
+    // Initialize the timer to refresh data every 5 seconds
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
+      // Call the methods to fetch data from APIs
+      widget.auth.PasswordlessSignIn().then((_) {
+        getNews();
+        if (isMounted) {
+          setState(() {}); // Refresh the widget after sign-in.
+        }
+      });
+      getNews();
+      fetchLeagues();
+      fetchUsers();
+    });
+  }
+
+  void currency(context) {
+    getNews();
+    Locale locale = Localizations.localeOf(context);
+
+    var format =
+        NumberFormat.simpleCurrency(locale: Platform.localeName, name: 'NGN');
+  }
+
+  Future<void> fetchUsers() async {
+    getNews();
+    dynamic response = await http.get(Uri.parse(
+        'https://hattrick-server-production.up.railway.app//get-three'));
+
+    if (isMounted) {
+      // Check if the widget is still mounted
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        setState(() {
+          //leads = data.map((userJson) => AUser.fromJson(userJson)).toList();
+        });
+      } else {
+        throw Exception('Failed to load users');
+      }
+    }
+
     //while (true) {
     //sleep(Duration(seconds: 15));
     //fetchUsers();
@@ -196,9 +317,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          auth.logOut();
+                          widget.auth.logOut();
                           print("Werey wan log out");
-                          runApp(MyApp());
                           Navigator.push(
                             context,
                             MaterialPageRoute<void>(
@@ -236,631 +356,515 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = widget.auth;
+    getNews();
     Locale locale = Localizations.localeOf(context);
-    var format =
-        NumberFormat.simpleCurrency(locale: Platform.localeName, name: 'NGN');
+    //var format =
+    //  NumberFormat.simpleCurrency(locale: Platform.localeName, name: 'NGN');
     final formatter = NumberFormat('#,###,###,###,###,###');
-    String balance =
-        "${format.currencySymbol} ${auth.currentuser!.earning_balance}";
+
     int alpha = 0x5C; // 92 in decimal
 
     // Define the color with transparency
     Color myColor = Color.fromRGBO(0x89, 0xE2, 0xF6, alpha / 255.0);
-    if (auth.currentuser != null) {
+    Map<String, dynamic> me = {};
+
+    all_leads.asMap().forEach((key, user) {
+      if (user.username == auth.currentuser!.username) {
+        me = {
+          "position": key + 1,
+          "username": user.username,
+          "city": user.city
+        };
+      }
+    });
+
+    if (auth.currentuser != null || news != null) {
       //print(auth.currentuser!.coins);
       return Scaffold(
         backgroundColor: Color(0xFF0B0B0B),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            isMounted =
-                true; // Set isMounted to true when the widget is mounted
-            auth.PasswordlessSignIn().then((_) {
-              if (isMounted) {
-                setState(() {}); // Refresh the widget after sign-in.
-              }
-            });
-            //_startPaystack();
-            fetchUsers();
-          },
-          child: Padding(
-            padding: EdgeInsets.only(left: 20, right: 20),
-            child: ListView(
-              children: [
-                SizedBox(height: 66),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width - 94,
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: 'Welcome, ',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 36,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            TextSpan(
-                              text: auth.currentuser!.FullName.toString(),
-                              style: GoogleFonts.poppins(
-                                color: Color.fromARGB(176, 137, 153, 246),
-                                fontSize: 36,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Spacer(),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.push<void>(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => Notifications(),
-                          ),
-                        );
-                      },
-                      icon: Icon(
-                        Icons.notifications,
-                        color: Color.fromARGB(60, 255, 255, 255),
-                        weight: 1.5,
-                      ),
-                    )
-                  ],
-                ),
-                SizedBox(height: 22),
+        body: FutureBuilder<User?>(
+            future: _user,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                final user = snapshot.data;
 
-                SizedBox(height: 25),
-                Container(
-                  width: MediaQuery.of(context).size.width - 60,
-                  //height: 114,
-                  padding:
-                      EdgeInsets.only(top: 19, bottom: 5, left: 25, right: 25),
-                  decoration: ShapeDecoration(
-                    color: Color(0xFFFFAA6D),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        news.last.category ?? "Category",
-                        style: GoogleFonts.poppins(
-                          color: Colors.black.withOpacity(0.6000000238418579),
-                          fontSize: 6,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      SizedBox(
-                        width: 279,
-                        child: Text(
-                          news.last.text ?? "Text",
-                          style: GoogleFonts.poppins(
-                            color: Colors.black,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 6),
-                      GestureDetector(
-                        onTap: () {
-                          News item = news.last;
-                          List<NewsTypes?> categories = [
-                            NewsTypes.Info,
-                            NewsTypes.Masters,
-                            NewsTypes.News,
-                            NewsTypes.Practice,
-                            NewsTypes.Quiz,
-                            NewsTypes.Super
-                          ];
-                          NewsTypes category;
-                          for (var type in categories) {
-                            if (type
-                                .toString()
-                                .contains(item.category ?? "Category")) {
-                              category = type!;
-                              if (category == NewsTypes.Quiz ||
-                                  category == NewsTypes.Masters ||
-                                  category == NewsTypes.Practice ||
-                                  category == NewsTypes.Super) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (BuildContext context) =>
-                                        QuizHome(),
-                                  ),
-                                );
-                              } else if (category == NewsTypes.News ||
-                                  category == NewsTypes.Info) {}
-                            }
-                          }
-                        },
-                        child: Container(
-                          width: 156.30,
-                          height: 30,
-                          child: Center(
-                            child: Text(
-                              'Go',
-                              style: GoogleFonts.poppins(
-                                color: Color(0xFFFFAA6D),
-                                fontSize: 6,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          decoration: ShapeDecoration(
-                            color: Color(0xFF0B0B0B),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(height: 23),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 183,
-                  padding:
-                      EdgeInsets.only(top: 19, bottom: 5, left: 25, right: 25),
-                  decoration: ShapeDecoration(
-                    color: myColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: !auth.currentuser!.is_subscribed
-                        ? [
-                            SizedBox(height: 21.72),
-                            //This one fi cause error
-                            SizedBox(
-                                width: 178,
-                                height: 43.27,
-                                child: Text('Get Verified To Start Earning',
-                                    style: GoogleFonts.poppins(
-                                      color: Color.fromARGB(255, 255, 255, 255),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ))),
-                            SizedBox(height: 25.07),
-                            GestureDetector(
-                              child: Container(
-                                width: 195.29,
-                                height: 36.06,
-                                decoration: ShapeDecoration(
-                                  color: Color.fromARGB(255, 137, 226, 246),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Get Verified',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.poppins(
-                                      color: Color.fromARGB(255, 255, 255, 255),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                //...(Verify)...
-                              },
-                            ),
-                          ]
-                        : [
-                            SizedBox(height: 18.93),
-                            Text(
-                              'Earnings',
-                              style: GoogleFonts.poppins(
-                                color: Color(0x5B89E2F6),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                            SizedBox(height: 21.72),
-                            Container(
-                              //width: 178,
-                              child: Text(
-                                balance,
-                                style: GoogleFonts.poppins(
-                                  color: Color(0x5B89E2F6),
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 15.07),
-                            GestureDetector(
-                              child: Container(
-                                width: 98.88,
-                                height: 28,
-                                decoration: ShapeDecoration(
-                                  color: Color(0xFF89E2F6),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50),
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Withdraw',
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.poppins(
-                                      color: Color(0xFF322653),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              onTap: () {
-                                //...(Withdraw)...
-                                showInfo(
-                                    "Feature Not Yet Implemented, Upgrade to Stable Version",
-                                    Colors.red);
-                              },
-                            ),
-                          ],
-                  ),
-                ),
-                SizedBox(width: 16),
-                SizedBox(height: 30),
+                if (user!.earning_balance != null) {
+                  String? balance = "${formatter.format(user.earning_balance)}";
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      getNews();
+                      isMounted =
+                          true; // Set isMounted to true when the widget is mounted
 
-                CarouselSlider(
-                  options: CarouselOptions(
-                      height: 102,
-                      enableInfiniteScroll: true,
-                      autoPlay: true,
-                      autoPlayInterval: Duration(seconds: 9),
-                      autoPlayAnimationDuration: Duration(milliseconds: 800),
-                      viewportFraction: 1.2
-                      //itemMargin: 16
-                      ),
-                  items: [
-                    Container(
-                        width: MediaQuery.of(context).size.width - 35,
-                        height: 99,
-                        padding: EdgeInsets.only(
-                            left: 25, right: 25, top: 15, bottom: 15),
-                        decoration: ShapeDecoration(
-                          color: Color(0xFF6DB9FF),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5)),
-                        ),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  auth.currentuser!.is_subscribed
-                                      ? 'Play in The League and Stand a Chance to win Big'
-                                      : 'Join The League and Stand a Chance to win Big',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  )),
-                              GestureDetector(
-                                onTap: () {
-                                  if (auth.currentuser!.is_subscribed) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute<void>(
-                                        builder: (BuildContext context) =>
-                                            QuizHome(),
-                                      ),
-                                    );
-                                  } else {
-                                    //...Verify...
-                                  }
-                                },
-                                child: Container(
-                                  width: 156.30,
-                                  height: 30,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF0B0B0B),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  child: Center(
-                                      child: Text(
-                                    auth.currentuser!.is_subscribed
-                                        ? 'Play Now'
-                                        : 'Subscribe To Join',
-                                    style: GoogleFonts.poppins(
-                                      color: Color(0xFF6DB9FF),
-                                      fontSize: 6,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  )),
-                                ),
-                              )
-                            ])),
-
-//2
-
-                    Container(
-                        width: MediaQuery.of(context).size.width - 35,
-                        height: 99,
-                        padding: EdgeInsets.only(
-                            left: 25, right: 25, top: 15, bottom: 15),
-                        decoration: ShapeDecoration(
-                          color: Color(0xFF826DFF),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5)),
-                        ),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  'Play Practice Games to get a glimpse of the world of Hattrick',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  )),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (BuildContext context) =>
-                                          QuizHome(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 156.30,
-                                  height: 30,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF0B0B0B),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  child: Center(
-                                      child: Text(
-                                    'Play Now',
-                                    style: GoogleFonts.poppins(
-                                      color: Color(0xFF826DFF),
-                                      fontSize: 6,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  )),
-                                ),
-                              )
-                            ])),
-
-                    Container(
-                        width: MediaQuery.of(context).size.width - 35,
-                        height: 99,
-                        padding: EdgeInsets.only(
-                            left: 25, right: 25, top: 15, bottom: 15),
-                        decoration: ShapeDecoration(
-                          color: Color(0xFF8AFF6D),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5)),
-                        ),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  ' Play and Earn with Master’s Quiz \n Earn Up To N10,000 for each quiz',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  )),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (BuildContext context) =>
-                                          QuizHome(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 156.30,
-                                  height: 30,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF0B0B0B),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  child: Center(
-                                      child: Text(
-                                    'Play Now',
-                                    style: GoogleFonts.poppins(
-                                      color: Color(0xFF8AFF6D),
-                                      fontSize: 6,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  )),
-                                ),
-                              )
-                            ])),
-
-                    Container(
-                        width: MediaQuery.of(context).size.width - 35,
-                        height: 99,
-                        padding: EdgeInsets.only(
-                            left: 25, right: 25, top: 15, bottom: 15),
-                        decoration: ShapeDecoration(
-                          color: Color(0xFFFF7F6D),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(5)),
-                        ),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Score A Hattrick and Win N1,000,000',
-                                  style: GoogleFonts.poppins(
-                                    color: Colors.black,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  )),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                      builder: (BuildContext context) =>
-                                          QuizHome(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  width: 156.30,
-                                  height: 30,
-                                  decoration: ShapeDecoration(
-                                    color: Color(0xFF0B0B0B),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                  ),
-                                  child: Center(
-                                      child: Text(
-                                    'Play Now',
-                                    style: GoogleFonts.poppins(
-                                      color: Color(0xFFFF7F6D),
-                                      fontSize: 6,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  )),
-                                ),
-                              )
-                            ])),
-                    // Add more containers for additional slides
-                  ],
-                ),
-
-                SizedBox(height: 30),
-                //Leaderboards!!!
-                Text(
-                  'Leaderboard',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 12),
-
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding:
-                        EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (var user in leads)
+                      //_startPaystack();
+                      fetchUsers();
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 20, right: 20),
+                      child: ListView(
+                        children: [
+                          SizedBox(height: 21),
                           GestureDetector(
-                            // title: Text(user.username),
-                            onTap: () async {
-                              final response = await http.post(
-                                Uri.parse(
-                                    "https://hattrick-server-production.up.railway.app/userlytics"),
-                                headers: <String, String>{
-                                  'Content-Type':
-                                      'application/json; charset=UTF-8',
-                                },
-                                body: jsonEncode(<String, String>{
-                                  'username': user.username,
-                                }),
-                              );
-                              final data = jsonDecode(response.body);
-                              final all_score = data['super_points'] +
-                                  data['practice_points'];
-                              double percentage = data['percentage'];
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                      VisitProfile(
-                                    userData: data,
-                                  ),
+                            onTap: user.is_subscribed
+                                ? () {
+                                    //...(Withdraw)...
+                                    showInfo(
+                                        "Feature Not Yet Implemented, Upgrade to Stable Version",
+                                        Colors.red);
+                                  }
+                                : () {
+                                    //...(Subscribe)...
+                                  },
+                            child: Row(
+                              children: [
+                                Spacer(),
+                                Container(
+                                  width: 159,
+                                  height: 32,
+                                  decoration:
+                                      BoxDecoration(color: Color(0xFF141414)),
+                                  child: Container(
+                                      child: user.is_subscribed
+                                          ? Row(children: [
+                                              Spacer(),
+                                              Text(balance,
+                                                  style: GoogleFonts.poppins(
+                                                      color: Color(0xFFDDDDDD),
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.normal)),
+                                              Text(
+                                                "NGN",
+                                                style: GoogleFonts.poppins(
+                                                    color: Color(0xFFFFD700),
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                              ),
+                                              SizedBox(
+                                                width: 12,
+                                              )
+                                            ])
+                                          : Row(
+                                              children: [
+                                                Spacer(),
+                                                Text(
+                                                    "Get Verified to start earning",
+                                                    style: GoogleFonts.poppins(
+                                                        color:
+                                                            Color(0xFFDDDDDD),
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.normal)),
+                                                SizedBox(width: 12)
+                                              ],
+                                            )),
                                 ),
-                              );
-                            },
-
-                            child: Row(children: [
-                              Text(
-                                "0${leads.indexOf(user) + 1}",
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white
-                                      .withOpacity(0.550000011920929),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              SizedBox(width: 11),
-                              Container(
-                                width: 20,
-                                height: 20,
-                                decoration: ShapeDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage(user.city.toString()),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  shape: OvalBorder(),
-                                ),
-                                //child: Image.network(flag.toString()),
-                              ),
-                              SizedBox(width: 9),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 7),
+                          Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 48,
+                              decoration:
+                                  BoxDecoration(color: Color(0xFF141414)),
+                              padding: EdgeInsets.only(
+                                  left: 11, right: 11, top: 8, bottom: 8),
+                              child: Row(
                                 children: [
+                                  Spacer(),
+                                  Image.asset(
+                                    "coin.png",
+                                    width: 32,
+                                    height: 32,
+                                    fit: BoxFit.fill,
+                                  ),
+                                  Text(formatNumber(user.coins!.toInt()),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.normal)),
+                                  Spacer(),
+                                  Image.asset(
+                                    "logo.PNG",
+                                    width: 32,
+                                    height: 32,
+                                    fit: BoxFit.fill,
+                                  ),
+                                  Text(user.hattricks.toString(),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.normal)),
+                                  Spacer(),
+                                  Image.asset(
+                                    "xp.png",
+                                    width: 32,
+                                    height: 32,
+                                    fit: BoxFit.fill,
+                                  ),
                                   Text(
-                                    user.username,
+                                      formatNumber(auth
+                                          .currentuser!.practice_points!
+                                          .toInt()),
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.normal)),
+                                  Spacer()
+                                ],
+                              )),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width - 94,
+                            child: Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: 'Welcome, ',
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
-                                    'Super League Points: ${user.superPoints}',
+                                  TextSpan(
+                                    text: user.FullName.toString(),
                                     style: GoogleFonts.poppins(
-                                      color: Colors.white
-                                          .withOpacity(0.7200000286102295),
-                                      fontSize: 6,
-                                      fontWeight: FontWeight.w400,
+                                      color: Color.fromARGB(176, 137, 153, 246),
+                                      fontSize: 36,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(height: 15)
                                 ],
-                              )
-                            ]),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 22),
+                          Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 235,
+                                padding: EdgeInsets.only(
+                                    top: 19, bottom: 5, left: 25, right: 25),
+                                decoration: ShapeDecoration(
+                                  color: Color(0xFF141414),
+                                  image: DecorationImage(
+                                      image: AssetImage('banner.jpeg'),
+                                      fit: BoxFit.fill),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15),
+                                    bottomRight: Radius.circular(15),
+                                  )),
+                                ),
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Hattrick Season ${leagues.last.id}",
+                                        style: GoogleFonts.poppins(
+                                            backgroundColor: Colors.black,
+                                            fontSize: 24,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        "Ends ${_formatDate(leagues.last.ends)}",
+                                        style: GoogleFonts.poppins(
+                                            backgroundColor: Colors.white,
+                                            fontSize: 6,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w500),
+                                      )
+                                    ]),
+                              ),
+                              Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 130,
+                                  padding: EdgeInsets.only(
+                                      top: 19, bottom: 5, left: 25, right: 25),
+                                  decoration: ShapeDecoration(
+                                    color: Color(0xFF171717),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(15),
+                                      bottomRight: Radius.circular(15),
+                                    )),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Image.asset(
+                                            "win.png",
+                                            height: 30,
+                                            width: 30,
+                                          ),
+                                          Text(
+                                              "${formatNumber(leagues.last.prize)} NGN",
+                                              style: GoogleFonts.poppins(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w700))
+                                        ],
+                                      ),
+                                      SizedBox(height: 37),
+                                      Row(children: [
+                                        Text(
+                                            "${formatNumber(leagues.last.players.length)} Players",
+                                            style: GoogleFonts.poppins(
+                                                color: Color(0xFFCACACA),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700)),
+                                        Spacer(),
+                                        GestureDetector(
+                                          onTap: () async {
+                                            if (user.is_subscribed &&
+                                                leagues.last.players
+                                                    .contains(user.uid)) {
+                                              Navigator.push<void>(
+                                                context,
+                                                MaterialPageRoute<void>(
+                                                  builder:
+                                                      (BuildContext context) =>
+                                                          QuizPage(
+                                                    auth: widget.auth,
+                                                    type: QuizType.Super_League,
+                                                  ),
+                                                ),
+                                              );
+                                            } else if (user.is_subscribed &&
+                                                !leagues.last.players
+                                                    .contains(user.uid)) {
+                                              final response = await http.post(
+                                                Uri.parse(
+                                                    'https://hattrick-server-production.up.railway.app/join_league'),
+                                                headers: <String, String>{
+                                                  'Content-Type':
+                                                      'application/json; charset=UTF-8',
+                                                },
+                                                body: jsonEncode(<String,
+                                                    dynamic>{
+                                                  'uid': user.uid.toString(),
+                                                  'id': leagues.last.id,
+                                                }),
+                                              );
 
-                            //subtitle: Text('Super Points: ${user.superPoints}'),
-                            //trailing: Text("${leads.indexOf(user) + 1}")
-                          )
-                      ],
+                                              print(response.body);
+                                            } else {
+                                              ScaffoldMessenger.of(context)
+                                                  .showMaterialBanner(
+                                                MaterialBanner(
+                                                  content:
+                                                      Text('Subscribe First'),
+                                                  actions: [
+                                                    IconButton(
+                                                      icon: Icon(Icons.close),
+                                                      onPressed: () {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .hideCurrentMaterialBanner();
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: Container(
+                                              width: 200,
+                                              height: 35,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color: Color(0xFF0B0B0B)),
+                                              child: Center(
+                                                child: Text(
+                                                    leagues.last.players
+                                                            .contains(
+                                                                user.username)
+                                                        ? "Play"
+                                                        : "Join The League",
+                                                    style: GoogleFonts.poppins(
+                                                        color: Colors.white,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w700)),
+                                              )),
+                                        )
+                                      ])
+                                    ],
+                                  )),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Container(
+                              width: 337,
+                              height: 100,
+                              padding: EdgeInsets.only(
+                                  left: 39.0,
+                                  right: 39.0,
+                                  top: 15.0,
+                                  bottom: 7.50),
+                              decoration:
+                                  BoxDecoration(color: Color(0xFF141414)),
+                              child: Column(
+                                children: [
+                                  Text("Hattrick Quiz",
+                                      style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700)),
+                                  SizedBox(height: 20),
+                                  Row(
+                                    children: [
+                                      Image.asset(
+                                        "win.png",
+                                        height: 30,
+                                        width: 30,
+                                      ),
+                                      Text("10,000 NGN",
+                                          style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700)),
+                                      Spacer(),
+                                      GestureDetector(
+                                        onTap: () async {
+                                          final response = await http.post(
+                                            Uri.parse(
+                                                "https://hattrick-server-production.up.railway.app//playable"),
+                                            body: jsonEncode(<String, String>{
+                                              'uid': user.uid.toString()
+                                            }),
+                                            headers: <String, String>{
+                                              'Content-Type':
+                                                  'application/json; charset=UTF-8',
+                                            },
+                                          );
+                                          final data =
+                                              jsonDecode(response.body);
+                                          if (data['coins'] < 1) {
+                                            showDialog(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return AlertDialog(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30)),
+                                                    elevation: 0,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    content: Container(
+                                                      width: 259,
+                                                      height: 320,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            width: 150,
+                                                            height: 150,
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            100),
+                                                                image: DecorationImage(
+                                                                    image: AssetImage(
+                                                                        "cb.jpeg"))),
+                                                          ),
+                                                          Text("Out Of Coins",
+                                                              style: GoogleFonts.poppins(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600)),
+                                                          Text(
+                                                            "Enough coins for today, see you tomorrow",
+                                                            style: GoogleFonts
+                                                                .poppins(
+                                                                    fontSize: 9,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                        child: Text('Close'),
+                                                      ),
+                                                    ],
+                                                  );
+                                                });
+                                          } else {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute<void>(
+                                                builder:
+                                                    (BuildContext context) =>
+                                                        new QuizPage(
+                                                  auth: widget.auth,
+                                                  type: QuizType.Practice_Play,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        child: Container(
+                                            width: 100,
+                                            height: 30,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                color: Color(0xFF0B0B0B)),
+                                            child: Center(
+                                              child: Text("Play",
+                                                  style: GoogleFonts.poppins(
+                                                      color: Colors.white,
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w700)),
+                                            )),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )),
+                          SizedBox(height: 23),
+                          SizedBox(width: 16),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+                  );
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              }
+            }),
       );
     } else {
       return Scaffold(

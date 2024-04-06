@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "hattrick-dbase.c3cgg6iwobuq.eu-north-1.rds.amazonaws.com",
+            "port": 5432,
+            "askForPassword": true,
+            "driver": "PostgreSQL",
+            "name": "hattrick-dbase",
+            "database": "hattrick",
+            "username": "anthony"
+        }
+    ]
+}

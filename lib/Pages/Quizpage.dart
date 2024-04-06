@@ -30,7 +30,8 @@ class TestQuestion {
 
 class QuizPage extends StatefulWidget {
   QuizType type;
-  QuizPage({required this.type, super.key});
+  HattrickAuth auth;
+  QuizPage({required this.type, super.key, required this.auth});
   @override
   _QuizPageState createState() => _QuizPageState();
 }
@@ -41,7 +42,7 @@ class _QuizPageState extends State<QuizPage> {
   int currentIndex = 0;
   int score = 0;
   late Timer questionTimer;
-  int remainingTime = 0;
+  double remainingTime = 0;
 
   @override
   void initState() {
@@ -49,7 +50,7 @@ class _QuizPageState extends State<QuizPage> {
     Wakelock.enable();
     _fetchQuestions();
     questionTimer = Timer(Duration.zero, () {});
-    auth.PasswordlessSignIn(); // Initialize with an empty timer
+    // Initialize with an empty timer
   }
 
   @override
@@ -58,7 +59,6 @@ class _QuizPageState extends State<QuizPage> {
     super.dispose();
   }
 
-  final auth = HattrickAuth();
   Future<void> _fetchQuestions() async {
     try {
       final responseEasy = await http.get(Uri.parse(
@@ -158,6 +158,7 @@ class _QuizPageState extends State<QuizPage> {
   }
 
   Future<dynamic> GameDone() async {
+    final auth = widget.auth;
     final response = await http.post(
         Uri.parse(
             "https://hattrick-server-production.up.railway.app//post-game"),
@@ -183,7 +184,6 @@ class _QuizPageState extends State<QuizPage> {
     //super_points: data['super_points'],
     //username: data['username'],
     //);
-    auth.PasswordlessSignIn();
   }
 
   void _moveToNextQuestion() {
@@ -194,7 +194,6 @@ class _QuizPageState extends State<QuizPage> {
       Navigator.pop(context);
       GameDone();
       _showResultDialog(score);
-      auth.PasswordlessSignIn();
     }
   }
 
@@ -208,7 +207,7 @@ class _QuizPageState extends State<QuizPage> {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           backgroundColor: Colors.white,
           content: Container(
-              height: 220,
+              height: 400,
               child: Padding(
                 padding: const EdgeInsets.only(
                     left: 15, right: 15, top: 36, bottom: 5),
@@ -309,6 +308,7 @@ class _QuizPageState extends State<QuizPage> {
                                     builder: (BuildContext context) =>
                                         new QuizPage(
                                       type: widget.type,
+                                      auth: widget.auth,
                                     ),
                                   ));
                             },
@@ -350,10 +350,10 @@ class _QuizPageState extends State<QuizPage> {
     }
 
     final currentQuestion = questions[currentIndex];
-    remainingTime = currentQuestion.duration;
-    questionTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+    remainingTime = currentQuestion.duration.toDouble();
+    questionTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       setState(() {
-        remainingTime--;
+        remainingTime = remainingTime - 0.1;
         if (remainingTime <= 0) {
           _moveToNextQuestion();
         }
@@ -364,57 +364,58 @@ class _QuizPageState extends State<QuizPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF0F8FB),
       body: questions.length < 10
           ? Center(child: CircularProgressIndicator())
           : Container(
-              color: Color.fromARGB(255, 240, 248, 251),
+              decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  image: DecorationImage(
+                      image: AssetImage("bgq.png"), fit: BoxFit.fill)),
               //padding: const EdgeInsets.all(20.0),
               child: ListView(
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Column(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: Icon(
-                                  Icons.close,
-                                  color: Colors.black,
-                                )),
-                            Spacer(),
-                            Text(
-                              "${currentIndex + 1}",
-                              style: GoogleFonts.poppins(
-                                color: Colors.black,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Spacer(),
-                          ],
-                        ),
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(
+                              Icons.close,
+                              color: Colors.white,
+                            )),
                       ],
                     ),
                   ),
                   SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: remainingTime / questions[currentIndex].duration,
-                    backgroundColor: Colors.grey[300],
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(Color(0xFFEA8843)),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15, right: 15),
+                    child: Column(
+                      children: [
+                        LinearProgressIndicator(
+                          value:
+                              remainingTime / questions[currentIndex].duration,
+                          backgroundColor: Colors.grey[300],
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xFFEA8843)),
+                        ),
+                        Text("${(currentIndex + 1)}/10",
+                            style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
                   SizedBox(
                     height: 13,
                   ),
                   Container(
                     decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.transparent,
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(50),
                             topRight: Radius.circular(50))),
@@ -429,62 +430,47 @@ class _QuizPageState extends State<QuizPage> {
                             child: Text(
                               questions[currentIndex].question,
                               style: GoogleFonts.poppins(
-                                color: Color.fromARGB(255, 43, 42, 49),
-                                fontSize: 24,
+                                color: Color.fromARGB(255, 255, 255, 255),
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
                           SizedBox(height: 26),
-                          Container(
-                            width: 150,
-                            height: 47,
-                            decoration: ShapeDecoration(
-                              color: Color(0x9EFFDFB0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "${4} Points",
-                                style: GoogleFonts.poppins(
-                                  color: Color(0xFFEA8843),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
                           SizedBox(height: 26),
                           ...questions[currentIndex].choices.map(
                                 (choice) => GestureDetector(
                                   onTap: () => _checkAnswer(choice),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        child: Center(
-                                          child: Text(
-                                            choice,
-                                            style: GoogleFonts.poppins(
-                                              color: Color(0xFF2B2A31),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w500,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 15, right: 15),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          child: Center(
+                                            child: Text(
+                                              choice,
+                                              style: GoogleFonts.poppins(
+                                                color: Color(0xFFFFFFFF),
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height: 81,
+                                          decoration: ShapeDecoration(
+                                            color: Color(0xFF151515),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
                                             ),
                                           ),
                                         ),
-                                        width: 335,
-                                        height: 81,
-                                        decoration: ShapeDecoration(
-                                          color: Color(0xFFF1ECF7),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(50),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 15),
-                                    ],
+                                        SizedBox(height: 12),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

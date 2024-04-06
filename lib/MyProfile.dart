@@ -20,20 +20,21 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
 
 class MyProfile extends StatefulWidget {
-  const MyProfile({super.key});
+  HattrickAuth auth;
+  MyProfile({super.key, required this.auth});
 
   @override
   State<MyProfile> createState() => _MyProfileState();
 }
 
 class _MyProfileState extends State<MyProfile> {
-  final auth = HattrickAuth();
   bool isMounted = false;
   String? flag;
 
   @override
   void initState() {
     super.initState();
+    final auth = widget.auth;
     isMounted = true; // Set isMounted to true when the widget is mounted
     auth.PasswordlessSignIn().then((_) async {
       if (isMounted) {
@@ -47,6 +48,7 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   dynamic getUserlytics() async {
+    final auth = widget.auth;
     final response = await http.post(
       Uri.parse(
           "https://hattrick-server-production.up.railway.app//userlytics"),
@@ -81,6 +83,7 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   void ShowLogOut() {
+    final auth = widget.auth;
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -175,15 +178,15 @@ class _MyProfileState extends State<MyProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = widget.auth;
     Locale locale = Localizations.localeOf(context);
-    var format =
-        NumberFormat.simpleCurrency(locale: Platform.localeName, name: 'NGN');
+    var format = "NGN";
     final formatter = NumberFormat('#,###,###,###,###,###');
-    String balance =
-        "${format.currencySymbol} ${auth.currentuser!.earning_balance}";
+
     final user = auth.currentuser;
     print(flag);
     if (user != null) {
+      String balance = " ${auth.currentuser!.earning_balance}";
       return Scaffold(
         body: Padding(
           padding: const EdgeInsets.only(left: 15.0, right: 15.0),

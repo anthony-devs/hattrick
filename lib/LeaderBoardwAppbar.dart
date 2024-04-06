@@ -18,21 +18,21 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
 
 class LeaderBoardBeta extends StatefulWidget {
-  const LeaderBoardBeta({super.key});
+  HattrickAuth auth;
+  LeaderBoardBeta({super.key, required this.auth});
 
   @override
   State<LeaderBoardBeta> createState() => _LeaderBoardBetaState();
 }
 
 class _LeaderBoardBetaState extends State<LeaderBoardBeta> {
-  final auth = HattrickAuth();
   List<AUser> leads = [];
   Map<String, Future<Uint8List>> svgImages = {};
 
   @override
   void initState() {
     super.initState();
-    auth.PasswordlessSignIn();
+
     fetchUsers();
   }
 
@@ -93,6 +93,7 @@ class _LeaderBoardBetaState extends State<LeaderBoardBeta> {
   }
 
   Widget build(BuildContext context) {
+    final auth = widget.auth;
     if (leads.isEmpty) {
       return Scaffold(
         body: Center(

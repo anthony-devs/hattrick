@@ -18,6 +18,8 @@ class User {
   bool is_subscribed;
   int? super_points;
   dynamic? played;
+  int? hattricks;
+  int? league_timeout;
 
   Future<void> delete() async {
     final response = await http.post(
@@ -36,7 +38,9 @@ class User {
       required this.is_subscribed,
       this.practice_points,
       this.super_points,
-      this.played = 0});
+      this.played = 0,
+      this.hattricks,
+      this.league_timeout});
 }
 
 class HattrickAuth {
@@ -72,7 +76,7 @@ class HattrickAuth {
 
       // You can now access the 'username' data from local storage like this:
       final savedUsername = preferences.getString('username');
-      print('Username from local storage: $savedUsername');
+      //print('Username from local storage: $savedUsername');
       await Login(email, password);
       //this.PasswordlessSignIn();
     } else {
@@ -112,8 +116,10 @@ class HattrickAuth {
             practice_points: data['practice_points'],
             super_points: data['super_points'],
             username: data['username'],
-            played: data['played']);
-        print(data['uid']);
+            played: data['played'],
+            hattricks: data['hattricks'],
+            league_timeout: data['league_timeout']);
+        //print(data['uid']);
         return 200;
       } else {
         //throw Exception(response.body);
@@ -153,7 +159,9 @@ class HattrickAuth {
           practice_points: data['practice_points'],
           super_points: data['super_points'],
           username: data['username'],
-          played: data['played']);
+          played: data['played'],
+          hattricks: data['hattricks'],
+          league_timeout: data['league_timeout']);
       await this.PasswordlessSignIn();
 
       return 200;
@@ -164,7 +172,7 @@ class HattrickAuth {
     } else if (response.statusCode == 508) {
       return 508;
     } else {
-      print("Failed To Log User In");
+      //print("Failed To Log User In");
       currentuser = null;
       return 500;
     }
