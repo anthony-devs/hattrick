@@ -199,149 +199,104 @@ class _QuizPageState extends State<QuizPage> {
 
   void _showResultDialog(score) {
     showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          elevation: 0,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: Colors.white,
-          content: Container(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            elevation: 0,
+            content: Container(
+              width: 350,
               height: 400,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 15, right: 15, top: 36, bottom: 5),
-                child: ListView(children: [
-                  Row(
-                    children: [
-                      Text(
-                        widget.type
-                            .toString()
-                            .split("_")
-                            .join(' ')
-                            .split('.')
-                            .join('')
-                            .replaceAll('QuizType', ''),
-                        style: GoogleFonts.poppins(
-                          color: Colors.black.withOpacity(0.7300000190734863),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Spacer(),
-                      Text(
-                        '${score}/10',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          color: Colors.black.withOpacity(0.7699999809265137),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )
-                    ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 22),
+                  score > 9
+                      ? Image.asset(
+                          "win.png",
+                          width: 120,
+                          height: 120,
+                        )
+                      : Center(
+                          child: Text(score.toString(),
+                              style: GoogleFonts.poppins(
+                                  fontSize: 24, fontWeight: FontWeight.bold))),
+                  SizedBox(height: score > 9 ? 21 : 27),
+                  Text(
+                    score > 9 ? "Congratulations" : "Failed",
+                    style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: score > 9 ? Colors.black : Colors.red),
                   ),
-                  SizedBox(height: 23),
-                  //Container(
-                  //height: 128,
-                  // width: 128,
-                  //decoration: BoxDecoration(
-                  //image: DecorationImage(
-                  //  image: AssetImage(score < 9
-                  //    ? "assets/failed.jpg"
-                  //  : "assets/fullscore.jpg")),
-                  //color: Color.fromARGB(255, 228, 228, 228),
-                  //shape: BoxShape.circle,
-                  //),
-                  //child: Center(),
-                  //),
-                  SizedBox(height: 27),
-                  Container(
-                    child: Column(children: [
-                      Text(
-                        widget.type == QuizType.Super_League
-                            ? 'Keep Playing To Be at The Top'
-                            : score > 9
-                                ? "Congrats, You Just Won N10,000"
-                                : "Practice More",
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                  score > 9
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("You Scored ",
+                                style: GoogleFonts.poppins(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500)),
+                            Text(
+                              "10",
+                              style: GoogleFonts.poppins(
+                                  color: Colors.green,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            Text(
+                              " Points",
+                              style: GoogleFonts.poppins(
+                                  color: Colors.black,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500),
+                            )
+                          ],
+                        )
+                      : Text(
+                          "Score 10 points to win",
+                          style: GoogleFonts.poppins(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
                         ),
-                      ),
-                      SizedBox(height: 45),
-                      Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              width: 134,
-                              height: 50,
-                              decoration: ShapeDecoration(
-                                color: Color(0xA589E2F6),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Back To Home',
-                                  style: GoogleFonts.poppins(
-                                    color: Color(0xFF322653),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(height: 8),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (BuildContext context) =>
-                                        new QuizPage(
-                                      type: widget.type,
-                                      auth: widget.auth,
-                                    ),
-                                  ));
-                            },
-                            child: Container(
-                              width: 134,
-                              height: 50,
-                              decoration: ShapeDecoration(
-                                color: Color(0xA589A0F6),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Play Again',
-                                  style: GoogleFonts.poppins(
-                                    color: Color(0xFF322653),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                    ]),
+                  SizedBox(height: 7),
+                  score > 9
+                      ? Text(
+                          "+10,000 NGN",
+                          style: GoogleFonts.poppins(
+                              color: Colors.green,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500),
+                        )
+                      : Container(),
+                  SizedBox(height: 32),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: 219,
+                      height: 48,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.black),
+                      child: Center(
+                          child: Text(
+                        "Back To Home",
+                        style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.normal),
+                      )),
+                    ),
                   )
-                ]),
-              )),
-        );
-      },
-    );
+                ],
+              ),
+            ),
+          );
+        });
   }
 
   void _startQuestionTimer() {

@@ -8,6 +8,8 @@ import 'Pages/login.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'Pages/quizupload.dart';
 import 'dart:async';
+
+import 'Pages/signup.dart';
 //import 'firebase_options.dart';
 //import 'package:firebase_core/firebase_core.dart';
 //import 'package:awesome_notifications/awesome_notifications.dart';
@@ -86,6 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return AuthPage();
+
     //return QuizUploader();
   }
 }
