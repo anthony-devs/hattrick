@@ -195,7 +195,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                                     fontWeight: FontWeight.normal)),
                             SizedBox(width: 11),
                             Image.asset(
-                              "logo.PNG",
+                              "assets/logo.PNG",
                               width: 21,
                               height: 21,
                               fit: BoxFit.fill,
@@ -255,7 +255,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                                     fontWeight: FontWeight.normal)),
                             SizedBox(width: 11),
                             Image.asset(
-                              "logo.PNG",
+                              "assets/logo.PNG",
                               width: 21,
                               height: 21,
                               fit: BoxFit.fill,

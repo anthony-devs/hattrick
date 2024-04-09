@@ -263,7 +263,7 @@ class _MyProfileState extends State<MyProfile> {
                                 fontWeight: FontWeight.normal)),
                         Spacer(),
                         Image.asset(
-                          "logo.PNG",
+                          "assets/logo.PNG",
                           width: 32,
                           height: 32,
                           fit: BoxFit.fill,
