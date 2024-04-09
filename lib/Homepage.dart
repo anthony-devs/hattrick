@@ -404,8 +404,12 @@ class _HomePageState extends State<HomePage> {
                       //_startPaystack();
                       fetchUsers();
                     },
-                    child: Padding(
+                    child: Container(
                       padding: EdgeInsets.only(left: 20, right: 20),
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage("assets/home.png"),
+                              fit: BoxFit.cover)),
                       child: ListView(
                         children: [
                           SizedBox(height: 21),
@@ -483,7 +487,7 @@ class _HomePageState extends State<HomePage> {
                                     "assets/coin.png",
                                     width: 32,
                                     height: 32,
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.cover,
                                   ),
                                   Text(formatNumber(user.coins!.toInt()),
                                       style: GoogleFonts.poppins(
@@ -495,7 +499,7 @@ class _HomePageState extends State<HomePage> {
                                     "assets/logo.PNG",
                                     width: 32,
                                     height: 32,
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.cover,
                                   ),
                                   Text(user.hattricks.toString(),
                                       style: GoogleFonts.poppins(
@@ -507,7 +511,7 @@ class _HomePageState extends State<HomePage> {
                                     "assets/xp.png",
                                     width: 32,
                                     height: 32,
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.cover,
                                   ),
                                   Text(
                                       formatNumber(auth
@@ -557,8 +561,8 @@ class _HomePageState extends State<HomePage> {
                                 decoration: ShapeDecoration(
                                   color: Color(0xFF141414),
                                   image: DecorationImage(
-                                      image: AssetImage('assets/banner.jpeg'),
-                                      fit: BoxFit.fill),
+                                      image: AssetImage('assets/banner.png'),
+                                      fit: BoxFit.cover),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(15),
@@ -596,7 +600,7 @@ class _HomePageState extends State<HomePage> {
                                   padding: EdgeInsets.only(
                                       top: 19, bottom: 5, left: 25, right: 25),
                                   decoration: ShapeDecoration(
-                                    color: Color(0xFF171717),
+                                    color: Colors.transparent,
                                     shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.only(
                                       bottomLeft: Radius.circular(15),
@@ -620,7 +624,7 @@ class _HomePageState extends State<HomePage> {
                                                   fontWeight: FontWeight.w700))
                                         ],
                                       ),
-                                      SizedBox(height: 37),
+                                      SizedBox(height: 21),
                                       Row(children: [
                                         Text(
                                             "${formatNumber(leagues.last.players.length)} Players",
@@ -685,7 +689,7 @@ class _HomePageState extends State<HomePage> {
                                           },
                                           child: Container(
                                               width: 200,
-                                              height: 35,
+                                              height: 45,
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(12),
@@ -718,16 +722,21 @@ class _HomePageState extends State<HomePage> {
                                   right: 39.0,
                                   top: 15.0,
                                   bottom: 7.50),
-                              decoration:
-                                  BoxDecoration(color: Color(0xFF141414)),
+                              decoration: BoxDecoration(
+                                  color: Color(0xFF171717),
+                                  borderRadius: BorderRadius.circular(15)),
                               child: Column(
                                 children: [
-                                  Text("Hattrick Quiz",
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700)),
-                                  SizedBox(height: 20),
+                                  Row(
+                                    children: [
+                                      Text("Hattrick Quiz",
+                                          style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w700)),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
                                   Row(
                                     children: [
                                       Image.asset(
@@ -738,8 +747,8 @@ class _HomePageState extends State<HomePage> {
                                       Text("10,000 NGN",
                                           style: GoogleFonts.poppins(
                                               color: Colors.white,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w700)),
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w800)),
                                       Spacer(),
                                       GestureDetector(
                                         onTap: () async {
@@ -835,8 +844,8 @@ class _HomePageState extends State<HomePage> {
                                           }
                                         },
                                         child: Container(
-                                            width: 100,
-                                            height: 30,
+                                            width: 120,
+                                            height: 45,
                                             decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(12),
@@ -847,7 +856,7 @@ class _HomePageState extends State<HomePage> {
                                                       color: Colors.white,
                                                       fontSize: 10,
                                                       fontWeight:
-                                                          FontWeight.w700)),
+                                                          FontWeight.w800)),
                                             )),
                                       ),
                                     ],

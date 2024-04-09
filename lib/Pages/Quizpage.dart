@@ -325,7 +325,7 @@ class _QuizPageState extends State<QuizPage> {
               decoration: BoxDecoration(
                   color: Colors.transparent,
                   image: DecorationImage(
-                      image: AssetImage("assets/bgq.png"), fit: BoxFit.fill)),
+                      image: AssetImage("assets/bgq.png"), fit: BoxFit.cover)),
               //padding: const EdgeInsets.all(20.0),
               child: ListView(
                 children: [

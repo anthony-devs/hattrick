@@ -203,7 +203,7 @@ class _MyProfileState extends State<MyProfile> {
         body: Container(
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage("assets/pp.png"), fit: BoxFit.fill)),
+                  image: AssetImage("assets/pp.png"), fit: BoxFit.cover)),
           padding: EdgeInsets.only(left: 15.0, right: 15.0),
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -254,7 +254,7 @@ class _MyProfileState extends State<MyProfile> {
                           "assets/coin.png",
                           width: 32,
                           height: 32,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.cover,
                         ),
                         Text(formatNumber(user.coins!.toInt()),
                             style: GoogleFonts.poppins(
@@ -266,7 +266,7 @@ class _MyProfileState extends State<MyProfile> {
                           "assets/logo.PNG",
                           width: 32,
                           height: 32,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.cover,
                         ),
                         Text(user.hattricks.toString(),
                             style: GoogleFonts.poppins(
@@ -278,7 +278,7 @@ class _MyProfileState extends State<MyProfile> {
                           "assets/xp.png",
                           width: 32,
                           height: 32,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.cover,
                         ),
                         Text(
                             formatNumber(

@@ -186,7 +186,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                               "assets/xp.png",
                               width: 21,
                               height: 21,
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                             ),
                             Text(formatNumber(users.first.practice_points),
                                 style: GoogleFonts.poppins(
@@ -198,7 +198,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                               "assets/logo.PNG",
                               width: 21,
                               height: 21,
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                             ),
                             Text(users.first.hattricks.toString(),
                                 style: GoogleFonts.poppins(
@@ -246,7 +246,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                               "assets/xp.png",
                               width: 21,
                               height: 21,
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                             ),
                             Text(formatNumber(user.practice_points),
                                 style: GoogleFonts.poppins(
@@ -258,7 +258,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                               "assets/logo.PNG",
                               width: 21,
                               height: 21,
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                             ),
                             Text(user.hattricks.toString(),
                                 style: GoogleFonts.poppins(
@@ -324,7 +324,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                               "assets/win.png",
                               width: 21,
                               height: 21,
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                             ),
                             Text(formatNumber(superUsers.first.superPoints),
                                 style: GoogleFonts.poppins(
@@ -372,7 +372,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                               "assets/win.png",
                               width: 21,
                               height: 21,
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                             ),
                             Text(formatNumber(user.superPoints),
                                 style: GoogleFonts.poppins(

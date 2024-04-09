@@ -83,7 +83,7 @@ return RefreshIndicator(
                                 "assets/coin.png",
                                 width: 32,
                                 height: 32,
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                               ),
                               Text(
                                   formatNumber(
@@ -97,7 +97,7 @@ return RefreshIndicator(
                                 "assets/logo.PNG",
                                 width: 32,
                                 height: 32,
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                               ),
                               Text(user!.hattricks.toString(),
                                   style: GoogleFonts.poppins(
@@ -109,7 +109,7 @@ return RefreshIndicator(
                                 "assets/xp.png",
                                 width: 32,
                                 height: 32,
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                               ),
                               Text(
                                   formatNumber(auth
@@ -160,7 +160,7 @@ return RefreshIndicator(
                               color: Color(0xFF141414),
                               image: DecorationImage(
                                   image: AssetImage('assets/banner.jpeg'),
-                                  fit: BoxFit.fill),
+                                  fit: BoxFit.cover),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(15),
