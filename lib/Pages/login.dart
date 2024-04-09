@@ -103,47 +103,59 @@ class _LoginState extends State<Login> {
                 onPressed: () async {
                   final code = await auth.Login(email.text, password.text);
                   if (code == 200) {
-                    //Navigator.pop(context);
-
-                    await Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AuthPage()));
-                    await showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
-                            elevation: 0,
-                            backgroundColor: Colors.white,
-                            content: Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(30)),
-                                width: 259,
-                                height: 320,
-                                //padding: EdgeInsets.only(),
-                                child: Center(
-                                    child: Column(children: [
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Home(
+                                auth: auth,
+                              )),
+                    );
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30)),
+                          elevation: 0,
+                          backgroundColor: Colors.white,
+                          content: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            width: 259,
+                            height: 320,
+                            child: Center(
+                              child: Column(
+                                children: [
                                   Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                          image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/welcome.jpeg"))),
-                                      width: 150,
-                                      height: 150),
-                                  Text("Welcome Back",
-                                      style: GoogleFonts.poppins(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 16)),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(100),
+                                      image: DecorationImage(
+                                        image:
+                                            AssetImage("assets/welcome.jpeg"),
+                                      ),
+                                    ),
+                                    width: 150,
+                                    height: 150,
+                                  ),
                                   Text(
-                                      "Logged in as user @${auth.currentuser!.username}",
-                                      style: GoogleFonts.poppins(
-                                          color: Color(0xFF2F2F2F),
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 9)),
+                                    "Welcome Back",
+                                    style: GoogleFonts.poppins(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  Text(
+                                    "Logged in as user @${auth.currentuser!.username}",
+                                    style: GoogleFonts.poppins(
+                                      color: Color(0xFF2F2F2F),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 9,
+                                    ),
+                                  ),
                                   SizedBox(height: 17),
                                   GestureDetector(
                                     onTap: () {
@@ -151,57 +163,58 @@ class _LoginState extends State<Login> {
                                         context,
                                         MaterialPageRoute<void>(
                                           builder: (BuildContext context) =>
-                                              Home(
-                                            auth: auth,
-                                          ),
+                                              Home(auth: auth),
                                         ),
                                       );
                                     },
                                     child: Container(
                                       child: Center(
-                                        child: Text("Continue To Home",
-                                            style: GoogleFonts.poppins(
-                                              color: Color(0xFFFFFFFF),
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 12,
-                                            )),
+                                        child: Text(
+                                          "Continue To Home",
+                                          style: GoogleFonts.poppins(
+                                            color: Color(0xFFFFFFFF),
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 12,
+                                          ),
+                                        ),
                                       ),
                                       width: 160,
                                       height: 33.61,
                                       decoration: BoxDecoration(
-                                          color: Color(0xFF9063E1),
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
+                                        color: Color(0xFF9063E1),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
                                   )
-                                ]))),
-                          );
-                        });
-                    // runApp(MyApp());
-                  } else if (code == 404) {
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
                     Fluttertoast.showToast(
-                        msg: "Unknown User, Please Create an Account",
-                        textColor: Colors.white,
-                        backgroundColor: Colors.deepOrange,
-                        fontSize: 16.0);
-                  } else if (code == 500) {
-                    Fluttertoast.showToast(
-                        msg: "An Error Occured",
-                        textColor: Colors.white,
-                        backgroundColor: Colors.deepOrange,
-                        fontSize: 16.0);
-                  } else if (code == 508) {
-                    Fluttertoast.showToast(
-                        msg: "Invalid Password",
+                        msg: "Logged In",
                         textColor: Colors.white,
                         backgroundColor: Colors.deepOrange,
                         fontSize: 16.0);
                   } else {
+                    String message;
+                    if (code == 404) {
+                      message = "Unknown User, Please Create an Account";
+                    } else if (code == 500) {
+                      message = "An Error Occurred";
+                    } else if (code == 508) {
+                      message = "Invalid Password";
+                    } else {
+                      message = "Please Check your Network and Try again later";
+                    }
                     Fluttertoast.showToast(
-                        msg: "Please Check your Network and Try again later",
-                        textColor: Colors.white,
-                        backgroundColor: Colors.deepOrange,
-                        fontSize: 16.0);
+                      msg: message,
+                      textColor: Colors.white,
+                      backgroundColor: Colors.deepOrange,
+                      fontSize: 16.0,
+                    );
                   }
                 },
                 text: "Log In",

@@ -7,6 +7,7 @@ import 'package:hattrick/AuthPage.dart';
 import 'package:hattrick/main.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 //import 'package:rive/components.dart';
+import '../Home.dart';
 import '../Models/user.dart';
 import 'login.dart';
 import 'package:hattrick/Components/city_service.dart';
@@ -159,70 +160,73 @@ class _SignupState extends State<Signup> {
           final data = json.decode(response.body);
           print(code);
           if (code == 200) {
-            await auth.PasswordlessSignIn();
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30)),
-                    elevation: 0,
-                    backgroundColor: Colors.white,
-                    content: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30)),
-                        width: 259,
-                        height: 320,
-                        //padding: EdgeInsets.only(),
-                        child: Center(
-                            child: Column(children: [
-                          Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                  image: DecorationImage(
-                                      image:
-                                          AssetImage("assets/welcome.jpeg"))),
-                              width: 150,
-                              height: 150),
-                          Text("Welcome Back",
-                              style: GoogleFonts.poppins(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 16)),
-                          Text(
-                              "Logged in as user @${auth.currentuser!.username}",
-                              style: GoogleFonts.poppins(
-                                  color: Color(0xFF2F2F2F),
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 9)),
-                          SizedBox(height: 17),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Center(
-                              child: Container(
-                                child: Center(
-                                  child: Text("Continue To Home",
-                                      style: GoogleFonts.poppins(
-                                        color: Color(0xFFFFFFFF),
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 12,
-                                      )),
-                                ),
-                                width: 160,
-                                height: 33.61,
+            await auth.PasswordlessSignIn().then((_) {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      elevation: 0,
+                      backgroundColor: Colors.white,
+                      content: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(30)),
+                          width: 259,
+                          height: 320,
+                          //padding: EdgeInsets.only(),
+                          child: Center(
+                              child: Column(children: [
+                            Container(
                                 decoration: BoxDecoration(
-                                    color: Color(0xFF9063E1),
-                                    borderRadius: BorderRadius.circular(10)),
+                                    borderRadius: BorderRadius.circular(100),
+                                    image: DecorationImage(
+                                        image:
+                                            AssetImage("assets/welcome.jpeg"))),
+                                width: 150,
+                                height: 150),
+                            Text("Welcome Back",
+                                style: GoogleFonts.poppins(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 16)),
+                            Text(
+                                "Logged in as user @${auth.currentuser!.username}",
+                                style: GoogleFonts.poppins(
+                                    color: Color(0xFF2F2F2F),
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 9)),
+                            SizedBox(height: 17),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Center(
+                                child: Container(
+                                  child: Center(
+                                    child: Text("Continue To Home",
+                                        style: GoogleFonts.poppins(
+                                          color: Color(0xFFFFFFFF),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12,
+                                        )),
+                                  ),
+                                  width: 160,
+                                  height: 33.61,
+                                  decoration: BoxDecoration(
+                                      color: Color(0xFF9063E1),
+                                      borderRadius: BorderRadius.circular(10)),
+                                ),
                               ),
-                            ),
-                          )
-                        ]))),
-                  );
-                });
-
+                            )
+                          ]))),
+                    );
+                  });
+              setState(() {});
+            });
+            await Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MyApp()));
             //await runApp(MyApp());
             print(code);
           } else if (code == 404) {
@@ -353,14 +357,24 @@ class _SignupState extends State<Signup> {
                   SizedBox(height: 10),
                   NeumorphicButton(
                     onPressed: () {
-                      signUserUp();
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AuthPage(),
-                        ),
-                      );
+                      if (username.text.isNotEmpty &&
+                          fullName.text.isNotEmpty &&
+                          city!.isNotEmpty) {
+                        signUserUp();
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Home(auth: widget.auth),
+                          ),
+                        );
+                      } else {
+                        Fluttertoast.showToast(
+                            msg: "Fill Everything In",
+                            textColor: Colors.white,
+                            backgroundColor: Colors.deepOrange,
+                            fontSize: 16.0);
+                      }
                     },
                     text: "Sign Up",
                     isdarkMode: isdarkMode,
