@@ -480,7 +480,7 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Spacer(),
                                   Image.asset(
-                                    "coin.png",
+                                    "assets/coin.png",
                                     width: 32,
                                     height: 32,
                                     fit: BoxFit.fill,
@@ -504,7 +504,7 @@ class _HomePageState extends State<HomePage> {
                                           fontWeight: FontWeight.normal)),
                                   Spacer(),
                                   Image.asset(
-                                    "xp.png",
+                                    "assets/xp.png",
                                     width: 32,
                                     height: 32,
                                     fit: BoxFit.fill,
@@ -557,7 +557,7 @@ class _HomePageState extends State<HomePage> {
                                 decoration: ShapeDecoration(
                                   color: Color(0xFF141414),
                                   image: DecorationImage(
-                                      image: AssetImage('banner.jpeg'),
+                                      image: AssetImage('assets/banner.jpeg'),
                                       fit: BoxFit.fill),
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.only(
@@ -608,7 +608,7 @@ class _HomePageState extends State<HomePage> {
                                       Row(
                                         children: [
                                           Image.asset(
-                                            "win.png",
+                                            "assets/win.png",
                                             height: 30,
                                             width: 30,
                                           ),
@@ -731,7 +731,7 @@ class _HomePageState extends State<HomePage> {
                                   Row(
                                     children: [
                                       Image.asset(
-                                        "win.png",
+                                        "assets/win.png",
                                         height: 30,
                                         width: 30,
                                       ),
@@ -789,7 +789,7 @@ class _HomePageState extends State<HomePage> {
                                                                             100),
                                                                 image: DecorationImage(
                                                                     image: AssetImage(
-                                                                        "cb.jpeg"))),
+                                                                        "assets/cb.jpeg"))),
                                                           ),
                                                           Text("Out Of Coins",
                                                               style: GoogleFonts.poppins(

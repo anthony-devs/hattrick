@@ -133,8 +133,8 @@ class _LoginState extends State<Login> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(100),
                                       image: DecorationImage(
-                                        image:
-                                            AssetImage("assets/welcome.jpeg"),
+                                        image: AssetImage(
+                                            "assets/assets/welcome.jpeg"),
                                       ),
                                     ),
                                     width: 150,

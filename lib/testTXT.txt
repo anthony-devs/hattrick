@@ -80,7 +80,7 @@ return RefreshIndicator(
                             children: [
                               Spacer(),
                               Image.asset(
-                                "coin.png",
+                                "assets/coin.png",
                                 width: 32,
                                 height: 32,
                                 fit: BoxFit.fill,
@@ -106,7 +106,7 @@ return RefreshIndicator(
                                       fontWeight: FontWeight.normal)),
                               Spacer(),
                               Image.asset(
-                                "xp.png",
+                                "assets/xp.png",
                                 width: 32,
                                 height: 32,
                                 fit: BoxFit.fill,
@@ -159,7 +159,7 @@ return RefreshIndicator(
                             decoration: ShapeDecoration(
                               color: Color(0xFF141414),
                               image: DecorationImage(
-                                  image: AssetImage('banner.jpeg'),
+                                  image: AssetImage('assets/banner.jpeg'),
                                   fit: BoxFit.fill),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.only(
@@ -209,7 +209,7 @@ return RefreshIndicator(
                                   Row(
                                     children: [
                                       Image.asset(
-                                        "win.png",
+                                        "assets/win.png",
                                         height: 30,
                                         width: 30,
                                       ),
@@ -325,7 +325,7 @@ return RefreshIndicator(
                               Row(
                                 children: [
                                   Image.asset(
-                                    "win.png",
+                                    "assets/win.png",
                                     height: 30,
                                     width: 30,
                                   ),
@@ -379,7 +379,7 @@ return RefreshIndicator(
                                                                         100),
                                                             image: DecorationImage(
                                                                 image: AssetImage(
-                                                                    "cb.jpeg"))),
+                                                                    "assets/cb.jpeg"))),
                                                       ),
                                                       Text("Out Of Coins",
                                                           style: GoogleFonts

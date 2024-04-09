@@ -203,7 +203,7 @@ class _MyProfileState extends State<MyProfile> {
         body: Container(
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage("pp.png"), fit: BoxFit.fill)),
+                  image: AssetImage("assets/pp.png"), fit: BoxFit.fill)),
           padding: EdgeInsets.only(left: 15.0, right: 15.0),
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -251,7 +251,7 @@ class _MyProfileState extends State<MyProfile> {
                       children: [
                         Spacer(),
                         Image.asset(
-                          "coin.png",
+                          "assets/coin.png",
                           width: 32,
                           height: 32,
                           fit: BoxFit.fill,
@@ -275,7 +275,7 @@ class _MyProfileState extends State<MyProfile> {
                                 fontWeight: FontWeight.normal)),
                         Spacer(),
                         Image.asset(
-                          "xp.png",
+                          "assets/xp.png",
                           width: 32,
                           height: 32,
                           fit: BoxFit.fill,

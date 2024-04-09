@@ -183,7 +183,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              "xp.png",
+                              "assets/xp.png",
                               width: 21,
                               height: 21,
                               fit: BoxFit.fill,
@@ -243,7 +243,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                                     fontWeight: FontWeight.w500)),
                             Spacer(),
                             Image.asset(
-                              "xp.png",
+                              "assets/xp.png",
                               width: 21,
                               height: 21,
                               fit: BoxFit.fill,
@@ -321,7 +321,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Image.asset(
-                              "win.png",
+                              "assets/win.png",
                               width: 21,
                               height: 21,
                               fit: BoxFit.fill,
@@ -369,7 +369,7 @@ class _LeaderBoardState extends State<LeaderBoard>
                                     fontWeight: FontWeight.w500)),
                             Spacer(),
                             Image.asset(
-                              "win.png",
+                              "assets/win.png",
                               width: 21,
                               height: 21,
                               fit: BoxFit.fill,
