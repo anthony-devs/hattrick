@@ -693,7 +693,7 @@ class _HomePageState extends State<HomePage> {
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(12),
-                                                  color: Color(0xFF0B0B0B)),
+                                                  color: Color(0xFF899AF6)),
                                               child: Center(
                                                 child: Text(
                                                     leagues.last.players
@@ -702,7 +702,7 @@ class _HomePageState extends State<HomePage> {
                                                         ? "Play"
                                                         : "Join The League",
                                                     style: GoogleFonts.poppins(
-                                                        color: Colors.white,
+                                                        color: Colors.black,
                                                         fontSize: 10,
                                                         fontWeight:
                                                             FontWeight.w700)),
@@ -849,11 +849,11 @@ class _HomePageState extends State<HomePage> {
                                             decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(12),
-                                                color: Color(0xFF0B0B0B)),
+                                                color: Color(0xFF899AF6)),
                                             child: Center(
                                               child: Text("Play",
                                                   style: GoogleFonts.poppins(
-                                                      color: Colors.white,
+                                                      color: Colors.black,
                                                       fontSize: 10,
                                                       fontWeight:
                                                           FontWeight.w800)),
